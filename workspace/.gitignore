@@ -2,3 +2,4 @@ obj_dir/
 *.vcd
 *.vvp
 test*
+wave_dir

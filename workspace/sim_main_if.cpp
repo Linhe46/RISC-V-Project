@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     const std::unique_ptr<Vif> top{new Vif{contextp.get(), "TOP"}}; // modify the type as V<file_name>
     VerilatedVcdC *tfp = new VerilatedVcdC;
     top->trace(tfp, 0);
-    tfp->open("if_wave.vcd"); // set the output wave file name
+    tfp->open("wave_dir/if_wave.vcd"); // set the output wave file name
     // set the module inputs' initial value
     top->clk = 0;
     top->rst = 0;
