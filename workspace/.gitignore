@@ -3,3 +3,4 @@ obj_dir/
 *.vvp
 test*
 wave_dir
+*gen*

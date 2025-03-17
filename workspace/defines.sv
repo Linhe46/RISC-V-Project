@@ -9,6 +9,11 @@
 `define StallBranch     5'b00001
 `define StallLoad       5'b00011
 
+/* Some frequently used signals */
+`define REG_DATA_ZERO       32'b0
+`define REG_ADDR_ZERO       5'b0
+`define MEM_ADDR_ZERO       32'b0
+
 /*========================= Instruction Decode Begin ========================== */
 /* Opcode Types */
 `define OP_ALU          7'b011_0011     // R-type Arithmetic/Shift/Logical/Compare
@@ -33,7 +38,7 @@
 `define FUNCT3_SRL      3'b101          // shift right logical
 `define FUNCT3_SRA      3'b101          // shift right arithmetic
 `define FUNCT3_OR       3'b110
-`define FUNC3_AND       3'b111
+`define FUNCT3_AND       3'b111
 //------------- I-type Arithmetic/Shift/Logical/Compare ---------------
 `define FUNCT3_ADDI     3'b000
 `define FUNCT3_SLTI     3'b010
@@ -86,5 +91,30 @@
 
 /*========================= Instruction Decode End ========================== */
 
+/*========================= ALU_OP signal begin ============================= */
+// Used to select ALU operating mode(add, sub, shift, etc.)
+`define ALU_NOP         4'd0
+`define ALU_ADD         4'd1
+`define ALU_SUB         4'd2
+`define ALU_SLL         4'd3
+`define ALU_SLT         4'd4
+`define ALU_SLTU        4'd5
+`define ALU_XOR         4'd6
+`define ALU_SRL         4'd7
+`define ALU_SRA         4'd8
+`define ALU_OR          4'd9
+`define ALU_AND         4'd10
+/*========================= ALU_OP signal end =============================== */
+
+/*========================= ALU src select begin ============================ */
+`define ALU_SRC_RS2     1'd0
+`define ALU_SRC_IMM     1'd1
+/*========================= ALU src select begin ============================ */
+
+/*========================= Load/Store Mask begin ============================ */
+`define MASK_W          2'd0        // mask of lower word(default in RISCV32)
+`define MASK_H          2'd1        // mask of lower half-word(16bit)
+`define MASK_B          2'd2        // mask of lowest byte
+/*========================= Load/Store Mask end   ========================== */
 
 `endif
