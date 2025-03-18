@@ -57,14 +57,32 @@ module id(
 	logic[11:0] S_imm	= {inst[31:25], inst[11:7]};
 	logic[19:0] U_imm	= inst[31:12];
 	// B/J fmt are variations of S/U fmt, shift by add a LSB 0
-	logic[12:0] B_imm	= {inst[31], inst[7], inst[30:25], inst[11:8], 1'b0};
-	logic[20:0] J_imm	= {inst[31], inst[19:12], inst[20], inst[30:21], 1'b0};
-	/* branch signals generation */
-	// next PC
+	//logic[12:0] B_imm	= {inst[31], inst[7], inst[30:25], inst[11:8], 1'b0}; 		// bug in sim: always zero
+	//logic[20:0] J_imm	= {inst[31], inst[19:12], inst[20], inst[30:21], 1'b0};		// bug in sim: always zero
+	/*
+	logic[11:0] B_imm_new 	= {inst[31], inst[7], inst[30:25], inst[11:8]}; 
+	logic[19:0] J_imm_new	= {inst[31], inst[19:12], inst[20], inst[30:21]};
+	logic[12:0] B_imm		= 	B_imm_new << 1;
+	//logic[20:0] J_imm		= 	J_imm_new << 1;			// also bug ??
+	//logic[20:0]	J_imm		= {J_imm_new, 1'b0};	// also bug ???
+	*/
+	logic[31:0] sext_shift_B_imm;
+	assign sext_shift_B_imm		= 	{{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0}; 
+	logic[31:0] sext_shift_J_imm;
+	assign sext_shift_J_imm 	= 	{{12{inst[31]}}, inst[19:12], inst[20], inst[30:21], 1'b0};
+
+	/* next PC */
 	logic[31:0] pc_next = pc + 4; 
+	/* branch signals generation */
+	/*
 	logic[31:0] pc_bra	= pc + {{19{B_imm[12]}}, B_imm};
-	logic[31:0] pc_jal  = pc + {{11{J_imm[20]}}, J_imm};
+	logic[31:0] pc_jal  = pc + sext_J_imm;
 	logic[31:0] pc_jalr	= rs1_data_reg + {{11{J_imm[20]}}, J_imm};
+	*/
+	logic[31:0] pc_bra	= pc + sext_shift_B_imm;
+	logic[31:0] pc_jal  = pc + sext_shift_J_imm;
+	logic[31:0] pc_jalr	= rs1_data_reg + sext_shift_J_imm;
+
 	// branch if taken
 	logic rs1_eq_rs2	= 	rs2_data_reg == rs1_data_reg;
 	logic rs1_ne_rs2	= 	rs2_data_reg != rs1_data_reg;
@@ -182,6 +200,7 @@ module id(
 								default: begin end
 							endcase
 						end
+						default: begin end
 					endcase
 				end
 				`OP_ALUI: begin

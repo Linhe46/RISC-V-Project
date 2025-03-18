@@ -3,6 +3,31 @@
 #include "Vtest_id.h"   // modified as "V<file_name>.h"
 #include "verilated_vcd_c.h"
 #include <bitset>
+#include <vector>
+#include <iostream>
+
+// pack the instruction into a 32bit decimal for cpp assignment
+u_int32_t pack(const std::string& inst){
+    std::string filter_separate = "";
+    for(auto x: inst){
+        if(x == '0' || x == '1')
+            filter_separate.push_back(x);
+    }
+    if (filter_separate.length() > 32) {
+        filter_separate = filter_separate.substr(filter_separate.length() - 32);
+    }
+    std::bitset<32> binarySet(std::move(filter_separate));
+    return binarySet.to_ulong();
+}
+std::vector<std::string> insts{
+    "0000000_00000_00000_000_00000_0010011", // TEST Binary
+    "0000000_10101_00110_000_00001_0110011", // ADD x1, x21, x6
+    "0100000_10001_00101_000_00010_0110011", // SUB x2, x17, x5
+    "0000000_10001_00011_001_00100_0010011", // SLLI x4, x3, 17
+    "0100000_10011_00001_101_00100_0010011", // SRAI x4, x1, 19
+    "1111111_00010_00100_000_11111_1100011", // BEQ x4, x2, offset = -1 << 1   
+    "0000000_01000_00000_000_00011_1101111"  // JAL x3 offset = 8
+};
 
 int main(int argc, char **argv)
 {
@@ -28,6 +53,8 @@ int main(int argc, char **argv)
 
     /* start simulation until reaching finish time */
     /* you can also write a for-loop to run certain times */
+    int num_insts = insts.size();
+    int inst_ptr = 0;
     for(int i = 0; i < 50; i++){
         contextp->timeInc(1);   // increase the simulator's time stamp
         top->clk = !top->clk;   // toggle clock
@@ -38,8 +65,11 @@ int main(int argc, char **argv)
             else if(contextp->time() > 8){
                 top->rst = 0;
                 top->pc  = 0;
-                std::bitset<32> binarySet("00000000001100001000000010010011");  // addi x1, x1, 3
-                top->inst = binarySet.to_ulong();
+                //std::bitset<32> binarySet("00000000001100001000000010010011");  // addi x1, x1, 3
+                //top->inst = binarySet.to_ulong();
+                top->inst = pack(insts[inst_ptr]);
+                //std::cout << pack(insts[inst_ptr]) << std::endl;
+                inst_ptr = (inst_ptr + 1) % num_insts;
             }
             else {}
             //...

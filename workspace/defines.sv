@@ -112,7 +112,7 @@
 /*========================= ALU src select begin ============================ */
 
 /*========================= Load/Store Mask begin ============================ */
-`define MASK_W          2'd0        // mask of lower word(default in RISCV32)
+`define MASK_W          2'd0        // mask of lower word(default in RISCV 32 set)
 `define MASK_H          2'd1        // mask of lower half-word(16bit)
 `define MASK_B          2'd2        // mask of lowest byte
 /*========================= Load/Store Mask end   ========================== */
