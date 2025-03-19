@@ -1,9 +1,10 @@
 //%
 // ID stage
 // Function:
-// - Decode the instruction and generate imm, alu_ops
+// - Decode the instruction and generate imm, control signals, etc.
 // - Perform branch operation
 // - Get rs1/rs2 values from registers
+// TODO: hazzard detect and send stall signals
 
 /* verilator lint_off WIDTHEXPAND */
 `include "defines.sv"
@@ -12,6 +13,7 @@ module id(
     input       logic[5:0]     stall,
     input       logic[31:0]    pc,
     input       logic[31:0]    inst,
+    /*  rs1 and rs2 data are used only in branch/jump */
     input       logic[31:0]    rs1_data_reg,
     input       logic[31:0]    rs2_data_reg,
     
@@ -244,7 +246,7 @@ module id(
                 end
                 `OP_AUIPC: begin
                     `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, rd, pc + {U_imm, 12'b0} /* adhoc */)
-                    `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)
+                    `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)        // perform a '0 + pc_offset' operation for WB
                 end
                 /* branch logic begin */
                 `OP_BRA: begin

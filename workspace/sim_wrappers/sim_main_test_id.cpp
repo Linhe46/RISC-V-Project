@@ -64,9 +64,8 @@ int main(int argc, char **argv)
                 top->rst = 1;
             else if(contextp->time() > 8){
                 top->rst = 0;
-                top->pc  = 0;
-                //std::bitset<32> binarySet("00000000001100001000000010010011");  // addi x1, x1, 3
-                //top->inst = binarySet.to_ulong();
+                //top->pc  = 0;
+                top->pc = 4 * (inst_ptr % num_insts); // simulate PC with ptr
                 top->inst = pack(insts[inst_ptr]);
                 //std::cout << pack(insts[inst_ptr]) << std::endl;
                 inst_ptr = (inst_ptr + 1) % num_insts;

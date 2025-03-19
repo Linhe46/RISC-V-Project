@@ -5,7 +5,7 @@ SRC_DIR = .
 SIM_DIR = ./sim_wrappers
 
 # Verilog src files
-VERILOG_SRCS = test_id.sv id.sv registers.sv
+VERILOG_SRCS = test_id.sv id.sv registers.sv id_ex_reg.sv
 
 # Simulation src files
 SIM_SRCS = $(SIM_DIR)/sim_main_test_id.cpp
@@ -22,6 +22,8 @@ EXE = obj_dir/Vtest_id
 
 # GTKwave 
 GTKWAVE = gtkwave
+# add wave automatically
+TCL_FILE = test_id.tcl
 
 # Wave file
 WAVE = wave_dir/test_id.vcd
@@ -40,8 +42,8 @@ test_id: $(VERILOG_SRCS) $(SIM_SRCS) $(GEN_SRCS)
 run: $(EXE)
 	$(EXE)
 
-wave: $(WAVE)
-	$(GTKWAVE) $(WAVE)
+wave: $(WAVE) $(TCL_FILE)
+	$(GTKWAVE) -T $(TCL_FILE) $(WAVE)
 
 clean:
 	rm -rf $(OBJ_DIR) wave.vcd

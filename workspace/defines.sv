@@ -11,8 +11,11 @@
 
 /* Some frequently used signals */
 `define REG_DATA_ZERO       32'b0
+`define REG_DATA_WIDTH      32      // R32I
 `define REG_ADDR_ZERO       5'b0
+`define REG_ADDR_WIDTH      5       // 32 registers
 `define MEM_ADDR_ZERO       32'b0
+`define MEM_ADDR_WIDTH      32      // R32I
 
 /*========================= Instruction Decode Begin ========================== */
 /* Opcode Types */
@@ -93,6 +96,7 @@
 
 /*========================= ALU_OP signal begin ============================= */
 // Used to select ALU operating mode(add, sub, shift, etc.)
+`define ALU_OP_WIDTH    4
 `define ALU_NOP         4'd0
 `define ALU_ADD         4'd1
 `define ALU_SUB         4'd2
@@ -112,6 +116,7 @@
 /*========================= ALU src select begin ============================ */
 
 /*========================= Load/Store Mask begin ============================ */
+`define MASK_WIDTH      2
 `define MASK_W          2'd0        // mask of lower word(default in RISCV 32 set)
 `define MASK_H          2'd1        // mask of lower half-word(16bit)
 `define MASK_B          2'd2        // mask of lowest byte
