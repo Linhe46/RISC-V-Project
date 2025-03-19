@@ -5,10 +5,10 @@ SRC_DIR = .
 SIM_DIR = ./sim_wrappers
 
 # Verilog src files
-VERILOG_SRCS = test_id.sv id.sv registers.sv id_ex_reg.sv
+VERILOG_SRCS = id_tb.sv id.sv registers.sv id_ex_reg.sv
 
 # Simulation src files
-SIM_SRCS = $(SIM_DIR)/sim_main_test_id.cpp
+SIM_SRCS = $(SIM_DIR)/sim_main_id_tb.cpp
 
 # Register file generator using cpp
 GEN_SRCS = ./registers_gen.cpp
@@ -18,15 +18,15 @@ GEN_EXE = ./registers_gen
 OBJ_DIR = obj_dir
 
 # Executable file dir
-EXE = obj_dir/Vtest_id
+EXE = obj_dir/Vid_tb
 
 # GTKwave 
 GTKWAVE = gtkwave
 # add wave automatically
-TCL_FILE = test_id.tcl
+TCL_FILE = id_tb.tcl
 
 # Wave file
-WAVE = wave_dir/test_id.vcd
+WAVE = wave_dir/id_tb.vcd
 
 # Verilator Compiler
 VERILATOR = verilator
@@ -34,7 +34,7 @@ VERILATOR = verilator
 # Compiling Options
 VERILATOR_FLAGS = -cc --exe --build --trace
 
-test_id: $(VERILOG_SRCS) $(SIM_SRCS) $(GEN_SRCS)
+id_tb: $(VERILOG_SRCS) $(SIM_SRCS) $(GEN_SRCS)
 	g++ -o $(GEN_EXE) $(GEN_SRCS)
 	$(GEN_EXE)
 	$(VERILATOR) $(VERILATOR_FLAGS) $(VERILOG_SRCS) $(SIM_SRCS)
@@ -46,6 +46,6 @@ wave: $(WAVE) $(TCL_FILE)
 	$(GTKWAVE) -T $(TCL_FILE) $(WAVE)
 
 clean:
-	rm -rf $(OBJ_DIR) wave.vcd
+	rm -rf $(OBJ_DIR) $(WAVE)
 
 .PHONY: all run clean wave

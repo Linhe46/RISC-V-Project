@@ -1,6 +1,6 @@
 #include <memory>
 #include <verilated.h>
-#include "Vtest_id.h"   // modified as "V<file_name>.h"
+#include "Vid_tb.h"   // modified as "V<file_name>.h"
 #include "verilated_vcd_c.h"
 #include <bitset>
 #include <vector>
@@ -37,10 +37,10 @@ int main(int argc, char **argv)
     //contextp->randReset(2);     // randomlize all signals
     contextp->traceEverOn(true);    // turn on wave tracing
     //contextp->commandArgs(argc, argv);    // pass command args
-    const std::unique_ptr<Vtest_id> top{new Vtest_id{contextp.get(), "TOP"}}; // modify the type as V<file_name>
+    const std::unique_ptr<Vid_tb> top{new Vid_tb{contextp.get(), "TOP"}}; // modify the type as V<file_name>
     VerilatedVcdC *tfp = new VerilatedVcdC;
     top->trace(tfp, 0);
-    tfp->open("wave_dir/test_id.vcd"); // set the output wave file name
+    tfp->open("wave_dir/id_tb.vcd"); // set the output wave file name
     /* set the module inputs' initial value */
     // top->clk = ...
     // top->rst = ...
