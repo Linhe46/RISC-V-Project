@@ -1,3 +1,6 @@
+//%
+// Testbench for id stage, including ID stage, ID/EX regfile and Registers
+// Simply connect them and debugging
 
 /* verilator lint_off WIDTHEXPAND */
 `include "defines.sv"
@@ -74,13 +77,14 @@ module id_tb(
 
     id_ex_reg id_ex_reg_u(
         clk, rst, stall,
+        // register signals(in)
         rs1_data_reg, rs2_data_reg,
-        // id signals
+        // id signals(in)
         imm, rs1_rd_en, rs2_rd_en, rs1_addr, rs2_addr, rd_addr,
         alu_op, alu_src,
         mem_read, mem_write, mask, unsigned_load,
         reg_write, mem_to_reg,
-        // ex signals
+        // ex signals(out)
         rs1_data, rs2_data,
         imm_ex, rs1_rd_en_ex, rs2_rd_en_ex, rs1_addr_ex, rs2_addr_ex, rd_addr_ex,
         alu_op_ex, alu_src_ex,

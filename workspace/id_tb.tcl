@@ -9,6 +9,7 @@ set global_input {
 }
 set id_ex_reg_output {
     # regfile relevant signals
+    TOP.id_tb.id_ex_reg_u.imm_ex
     TOP.id_tb.id_ex_reg_u.rs1_rd_en_ex
     TOP.id_tb.id_ex_reg_u.rs2_rd_en_ex
     TOP.id_tb.id_ex_reg_u.rs1_data
