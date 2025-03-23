@@ -11,6 +11,7 @@
 
 /* Some frequently used signals */
 `define REG_DATA_ZERO       32'b0
+`define REG_DATA_ONE        32'd1   // used in COMPARE
 `define REG_DATA_WIDTH      32      // R32I
 `define REG_ADDR_ZERO       5'b0
 `define REG_ADDR_WIDTH      5       // 32 registers
