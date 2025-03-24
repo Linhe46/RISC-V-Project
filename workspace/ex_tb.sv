@@ -15,6 +15,7 @@ module ex_tb(
     output  logic                       mem_read_mem,
     output  logic                       mem_write_mem,
     output  logic[`MASK_WIDTH-1:0]      mask_mem,
+    output  logic                       unsigned_load_mem,
     output  logic                       reg_write_mem,
     output  logic                       mem_to_reg_mem
 );
@@ -130,10 +131,11 @@ module ex_tb(
         clk, rst, stall,
         // ex stage inputs
         alu_res_ex, bypass_op2_ex,
-        mem_read_ex, mem_write_ex, mask_ex, reg_write_ex, mem_to_reg_ex,
+        mem_read_ex, mem_write_ex, mask_ex, unsigned_load_ex,
+        reg_write_ex, mem_to_reg_ex,
         // mem stage outputs
         alu_res_mem, bypass_op2_mem,
-        mem_read_mem, mem_write_mem, mask_mem,
+        mem_read_mem, mem_write_mem, mask_mem, unsigned_load_mem,
         reg_write_mem, mem_to_reg_mem
     );
 

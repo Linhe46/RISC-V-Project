@@ -10,6 +10,7 @@ module ex_mem_reg(
     input   logic                       mem_read_ex,
     input   logic                       mem_write_ex,
     input   logic[`MASK_WIDTH-1:0]      mask_ex, 
+    input   logic                       unsigned_load_ex,
     input   logic                       reg_write_ex,
     input   logic                       mem_to_reg_ex,
 
@@ -20,27 +21,30 @@ module ex_mem_reg(
     output  logic                       mem_read_mem,
     output  logic                       mem_write_mem,
     output  logic[`MASK_WIDTH-1:0]      mask_mem,
+    output  logic                       unsigned_load_mem,
     output  logic                       reg_write_mem,
     output  logic                       mem_to_reg_mem
 );
     always_ff @(posedge clk) begin
         if(rst) begin
-            alu_res_mem     <=      `MEM_ADDR_ZERO;
-            bypass_op2_mem  <=      `REG_DATA_ZERO;
-            mem_read_mem    <=      0;
-            mem_write_mem   <=      0;
-            mask_mem        <=      `MASK_W;
-            reg_write_mem   <=      0;
-            mem_to_reg_mem  <=      0;
+            alu_res_mem         <=      `MEM_ADDR_ZERO;
+            bypass_op2_mem      <=      `REG_DATA_ZERO;
+            mem_read_mem        <=      0;
+            mem_write_mem       <=      0;
+            mask_mem            <=      `MASK_W;
+            unsigned_load_mem   <=      0;
+            reg_write_mem       <=      0;
+            mem_to_reg_mem      <=      0;
         end
         else begin
-            alu_res_mem     <=      alu_res_ex;
-            bypass_op2_mem  <=      bypass_op2_ex;
-            mem_read_mem    <=      mem_read_ex;
-            mem_write_mem   <=      mem_write_ex;
-            mask_mem        <=      mask_ex;
-            reg_write_mem   <=      reg_write_ex;
-            mem_to_reg_mem  <=      mem_to_reg_ex;
+            alu_res_mem         <=      alu_res_ex;
+            bypass_op2_mem      <=      bypass_op2_ex;
+            mem_read_mem        <=      mem_read_ex;
+            mem_write_mem       <=      mem_write_ex;
+            mask_mem            <=      mask_ex;
+            unsigned_load_mem   <=      unsigned_load_ex;
+            reg_write_mem       <=      reg_write_ex;
+            mem_to_reg_mem      <=      mem_to_reg_ex;
         end
     end
 endmodule

@@ -17,6 +17,7 @@ set ex_mem_reg_output {
     TOP.ex_tb.ex_mem_reg_u.mem_read_mem
     TOP.ex_tb.ex_mem_reg_u.mem_write_mem
     TOP.ex_tb.ex_mem_reg_u.mask_mem
+    TOP.ex_tb.ex_mem_reg_u.unsigned_load_mem
     TOP.ex_tb.ex_mem_reg_u.reg_write_mem
     TOP.ex_tb.ex_mem_reg_u.mem_to_reg_mem
 }
