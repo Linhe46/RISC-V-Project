@@ -7,9 +7,9 @@
 
 `include "defines.sv"
 module id_ex_reg(
-    input   logic       clk,
-    input   logic       rst,
-    input   logic[5:0]  stall,
+    input   logic                       clk,
+    input   logic                       rst,
+    input   logic[`STALL_WIDTH:0]       stall,
     /* to next stage */
     /* From register file begin */
     input   logic[`REG_DATA_WIDTH-1:0]  rs1_data_reg,
@@ -58,7 +58,9 @@ module id_ex_reg(
     output   logic       mem_to_reg_ex
 );
     always_ff @(posedge clk) begin
-        if(rst /*|| stall */) begin
+        // if stall, reset control bits
+        if(rst || stall == `STALL_LOAD || stall == `STALL_BRANCH)
+        begin
             rs1_data        <=  `REG_DATA_ZERO;
             rs2_data        <=  `REG_DATA_ZERO;
             imm_ex          <=  `REG_DATA_ZERO;

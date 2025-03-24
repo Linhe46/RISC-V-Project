@@ -2,16 +2,21 @@
 `include "defines.sv"
 module ex(
     input   logic                       rst,
-    input   logic[5:0]                  stall,
+    //input   logic[5:0]                  stall, // no stall state for ex
     // get from pipeline regfile
     input   logic[`REG_DATA_WIDTH-1:0]  rs1_data,
     input   logic[`REG_DATA_WIDTH-1:0]  rs2_data,
     input   logic[`REG_DATA_WIDTH-1:0]  imm,
-    input   logic                       rs1_rd_en,
-    input   logic                       rs2_rd_en,
-    input   logic[`REG_ADDR_WIDTH-1:0]  rs1_addr,
-    input   logic[`REG_ADDR_WIDTH-1:0]  rs2_addr,
-    input   logic[`REG_ADDR_WIDTH-1:0]  rd_addr,
+    
+    input   logic[`FORWARD_WIDTH-1:0]   forward_op1,
+    input   logic[`FORWARD_WIDTH-1:0]   forward_op2,
+    input   logic[`REG_DATA_WIDTH-1:0]  forward_data_mem,
+    input   logic[`REG_DATA_WIDTH-1:0]  forward_data_wb,
+    //input   logic                       rs1_rd_en,    connected to forward by pipe reg
+    //input   logic                       rs2_rd_en,
+    //input   logic[`REG_ADDR_WIDTH-1:0]  rs1_addr,
+    //input   logic[`REG_ADDR_WIDTH-1:0]  rs2_addr,
+    //input   logic[`REG_ADDR_WIDTH-1:0]  rd_addr,
     input   logic[`ALU_OP_WIDTH-1:0]    alu_op,
     input   logic                       alu_src,
     /*          // control bits are bypassed to pipeline regfile
@@ -36,9 +41,11 @@ module ex(
 );
     logic[`REG_DATA_WIDTH-1:0]  oprand1, oprand2;
     logic[`REG_DATA_WIDTH-1:0]  alu_op1, alu_op2;
-    // TODO: forwarding mux for oprand1/2
-    assign oprand1 =  rs1_data;
-    assign oprand2 =  rs2_data;
+    // DONE: forwarding mux for oprand1/2
+    assign oprand1 = forward_op1 == `FORWARD_MEM    ? forward_data_mem  :
+                                    `FORWARD_WB     ? forward_data_wb   :   rs1_data;
+    assign oprand2 = forward_op2 == `FORWARD_MEM    ? forward_data_mem  :
+                                    `FORWARD_WB     ? forward_data_wb   :   rs2_data;
 
     assign alu_op1 = oprand1;
     assign alu_op2 = (alu_src == `ALU_SRC_RS2) ? oprand2 : imm;

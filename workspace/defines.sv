@@ -6,8 +6,10 @@
 // Please modify as you need
 
 // Definitions For Stall Types
-`define StallBranch     5'b00001
-`define StallLoad       5'b00011
+`define STALL_WIDTH     5
+`define STALL_NOP       5'd0
+`define STALL_BRANCH    5'b00001
+`define STALL_LOAD      5'b00011
 
 /* Some frequently used signals */
 `define REG_DATA_ZERO       32'b0
@@ -122,5 +124,12 @@
 `define MASK_H          2'd1        // mask of lower half-word(16bit)
 `define MASK_B          2'd2        // mask of lowest byte
 /*========================= Load/Store Mask end   ========================== */
+
+/*========================= Forwarding Select Signals begin ================ */
+`define FORWARD_WIDTH   2
+`define FORWARD_NOP     2'd0     // no forward
+`define FORWARD_MEM     2'd1
+`define FORWARD_WB      2'd2
+/*========================= Forwarding Select Signals end ================ */
 
 `endif

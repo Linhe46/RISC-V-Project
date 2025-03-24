@@ -7,15 +7,15 @@
 
 `include "defines.sv"
 module PC(
-    input   wire            clk,
-    input   wire            rst,
-    input   wire            PC_write_en,
-    input   wire            is_uncon_branch,
-    input   wire            stall,
-    input   wire            branch_taken,
-    input   wire[31:0]      branch_addr,
-    output  logic           rd_en,
-    output  logic[31:0]     PC_out
+    input   logic                       clk,
+    input   logic                       rst,
+    //input   logic                       PC_write_en,
+    //input   logic                       is_uncon_branch,
+    input   logic[`STALL_WIDTH]         stall,
+    input   logic                       branch_taken,
+    input   logic[`MEM_ADDR_WIDTH-1:0]  branch_addr,
+    output  logic                       rd_en,
+    output  logic[31:0]                 PC_out
 );
 
     // read enable signal for InstMem
@@ -33,10 +33,10 @@ module PC(
     always_ff @(posedge clk) begin
         if(rst)
             PC_out <= 32'b0;
-        else if(PC_write_en)
-            PC_out <= PC_next;
-        else
+        else if(stall == `STALL_LOAD)   // re-fetch the instruction
             PC_out <= PC_out;
+        else
+            PC_out <= PC_next;
     end
 
     assign PC_next = branch_taken ? branch_addr : PC_out + 4;
