@@ -7,7 +7,7 @@ module ex_mem_reg(
     input   logic[`REG_DATA_WIDTH-1:0]  bypass_op2_ex,
     // rd address for WB and forwarding
     input   logic[`REG_ADDR_WIDTH-1:0]  rd_addr_ex,
-    // control bits
+    // control signals
     input   logic                       mem_read_ex,
     input   logic                       mem_write_ex,
     input   logic[`MASK_WIDTH-1:0]      mask_ex, 
@@ -18,13 +18,14 @@ module ex_mem_reg(
     // memory address & data
     output  logic[`REG_DATA_WIDTH-1:0]  alu_res_mem,    // address
     output  logic[`REG_DATA_WIDTH-1:0]  bypass_op2_mem, // data
-    // rd address for WB and forwarding
-    output  logic[`REG_ADDR_WIDTH-1:0]  rd_addr_mem,
-    // control bits
+    // bypass rd_addr for WB and forwarding
+    output  logic[`REG_ADDR_WIDTH-1:0]  rd_addr_mem,   
+
     output  logic                       mem_read_mem,
     output  logic                       mem_write_mem,
     output  logic[`MASK_WIDTH-1:0]      mask_mem,
     output  logic                       unsigned_load_mem,
+    // bypass wb stage control signals
     output  logic                       reg_write_mem,
     output  logic                       mem_to_reg_mem
 );

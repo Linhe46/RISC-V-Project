@@ -9,15 +9,15 @@ module registers(
     input logic      clk,
     input logic      rst,
     input logic      wr_en,
-    input logic      rs2_rd_en,
     input logic      rs1_rd_en,
-    input logic[4:0] rd2_addr,
+    input logic      rs2_rd_en,
     input logic[4:0] rd1_addr,
+    input logic[4:0] rd2_addr,
     input logic[4:0] wr_addr,
-    input logic[4:0] wr_data,
+    input logic[31:0] wr_data,
     
-    output logic[31:0] rd2_data,
-    output logic[31:0] rd1_data
+    output logic[31:0] rd1_data,
+    output logic[31:0] rd2_data
 );
 
     logic[31:0] regfile_initial[0:31];

@@ -132,4 +132,9 @@
 `define FORWARD_WB      2'd2
 /*========================= Forwarding Select Signals end ================ */
 
+/*========================= Memory Condfig Params =========================*/
+`define DATA_MEM_DATA_WIDTH     32          // cell width  
+`define DATA_MEM_SIZE           4096        // cell size
+`define DATA_MEM_SIZE_WIDTH     $clog2(`DATA_MEM_SIZE)    // cell size width
+
 `endif

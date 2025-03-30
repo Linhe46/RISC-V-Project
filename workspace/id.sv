@@ -10,7 +10,7 @@
 `include "defines.sv"
 module id(
     input       logic          rst,
-    input       logic[5:0]     stall,
+    input       logic[`STALL_WIDTH-1:0]     stall,
     input       logic[31:0]    pc,
     input       logic[31:0]    inst,
     /*  rs1 and rs2 data are used only in branch/jump */

@@ -34,11 +34,10 @@ module id_ex_reg(
     input   logic       reg_write_id,
     input   logic       mem_to_reg_id,
 
-    /* From register file begin */
     output   logic[`REG_DATA_WIDTH-1:0]  rs1_data,
     output   logic[`REG_DATA_WIDTH-1:0]  rs2_data,
-    /* From register file end */
     output   logic[`REG_DATA_WIDTH-1:0]  imm_ex,
+    // bypass signals for forwarding and WB
     output   logic                       rs1_rd_en_ex,
     output   logic                       rs2_rd_en_ex,
     output   logic[`REG_ADDR_WIDTH-1:0]  rs1_addr_ex,

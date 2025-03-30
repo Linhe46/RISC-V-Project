@@ -21,10 +21,10 @@ module ex(
     logic[`REG_DATA_WIDTH-1:0]  oprand1, oprand2;
     logic[`REG_DATA_WIDTH-1:0]  alu_op1, alu_op2;
     // DONE: forwarding mux for oprand1/2
-    assign oprand1 = forward_op1 == `FORWARD_MEM    ? forward_data_mem  :
-                                    `FORWARD_WB     ? forward_data_wb   :   rs1_data;
-    assign oprand2 = forward_op2 == `FORWARD_MEM    ? forward_data_mem  :
-                                    `FORWARD_WB     ? forward_data_wb   :   rs2_data;
+    assign oprand1 = (forward_op1 == `FORWARD_MEM)    ? forward_data_mem  :
+                     (forward_op1 == `FORWARD_WB)     ? forward_data_wb   :   rs1_data;
+    assign oprand2 = (forward_op2 == `FORWARD_MEM)    ? forward_data_mem  :
+                     (forward_op2 == `FORWARD_WB)     ? forward_data_wb   :   rs2_data;
 
     assign alu_op1 = oprand1;
     assign alu_op2 = (alu_src == `ALU_SRC_RS2) ? oprand2 : imm;
