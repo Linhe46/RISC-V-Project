@@ -2,7 +2,6 @@
 `include "defines.sv"
 module ex(
     input   logic                       rst,
-    //input   logic[5:0]                  stall, // no stall state for ex
     // get from pipeline regfile
     input   logic[`REG_DATA_WIDTH-1:0]  rs1_data,
     input   logic[`REG_DATA_WIDTH-1:0]  rs2_data,
@@ -12,30 +11,10 @@ module ex(
     input   logic[`FORWARD_WIDTH-1:0]   forward_op2,
     input   logic[`REG_DATA_WIDTH-1:0]  forward_data_mem,
     input   logic[`REG_DATA_WIDTH-1:0]  forward_data_wb,
-    //input   logic                       rs1_rd_en,    connected to forward by pipe reg
-    //input   logic                       rs2_rd_en,
-    //input   logic[`REG_ADDR_WIDTH-1:0]  rs1_addr,
-    //input   logic[`REG_ADDR_WIDTH-1:0]  rs2_addr,
-    //input   logic[`REG_ADDR_WIDTH-1:0]  rd_addr,
+
+    // alu control signals and results
     input   logic[`ALU_OP_WIDTH-1:0]    alu_op,
     input   logic                       alu_src,
-    /*          // control bits are bypassed to pipeline regfile
-    // control bits
-    input   logic                       mem_read_i,
-    input   logic                       mem_write_i,
-    input   logic[`MASK_WIDTH-1:0]      mask_i, 
-    input   logic                       reg_write_i,
-    input   logic                       mem_to_reg_i,
-    */
-    /*
-    // control bits
-    output  logic                       mem_read_o,
-    output  logic                       mem_write_o,
-    output  logic[`MASK_WIDTH-1:0]      mask_o,
-    output  logic                       reg_write_o,
-    output  logic                       mem_to_reg_o
-    */
-
     output  logic[`REG_DATA_WIDTH-1:0]  alu_res,
     output  logic[`REG_DATA_WIDTH-1:0]  bypass_op2
 );

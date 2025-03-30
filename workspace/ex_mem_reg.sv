@@ -3,9 +3,10 @@
 module ex_mem_reg(
     input   logic                       clk,
     input   logic                       rst,
-    input   logic[5:0]                  stall,
     input   logic[`REG_DATA_WIDTH-1:0]  alu_res_ex,
     input   logic[`REG_DATA_WIDTH-1:0]  bypass_op2_ex,
+    // rd address for WB and forwarding
+    input   logic[`REG_ADDR_WIDTH-1:0]  rd_addr_ex,
     // control bits
     input   logic                       mem_read_ex,
     input   logic                       mem_write_ex,
@@ -17,6 +18,8 @@ module ex_mem_reg(
     // memory address & data
     output  logic[`REG_DATA_WIDTH-1:0]  alu_res_mem,    // address
     output  logic[`REG_DATA_WIDTH-1:0]  bypass_op2_mem, // data
+    // rd address for WB and forwarding
+    output  logic[`REG_ADDR_WIDTH-1:0]  rd_addr_mem,
     // control bits
     output  logic                       mem_read_mem,
     output  logic                       mem_write_mem,
@@ -29,6 +32,7 @@ module ex_mem_reg(
         if(rst) begin
             alu_res_mem         <=      `MEM_ADDR_ZERO;
             bypass_op2_mem      <=      `REG_DATA_ZERO;
+            rd_addr_mem         <=      `REG_ADDR_ZERO;
             mem_read_mem        <=      0;
             mem_write_mem       <=      0;
             mask_mem            <=      `MASK_W;
@@ -39,6 +43,7 @@ module ex_mem_reg(
         else begin
             alu_res_mem         <=      alu_res_ex;
             bypass_op2_mem      <=      bypass_op2_ex;
+            rd_addr_mem         <=      rd_addr_ex;
             mem_read_mem        <=      mem_read_ex;
             mem_write_mem       <=      mem_write_ex;
             mask_mem            <=      mask_ex;

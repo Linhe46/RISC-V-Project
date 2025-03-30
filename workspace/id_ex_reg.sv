@@ -9,7 +9,7 @@
 module id_ex_reg(
     input   logic                       clk,
     input   logic                       rst,
-    input   logic[`STALL_WIDTH:0]       stall,
+    input   logic[`STALL_WIDTH-1:0]     stall,
     /* to next stage */
     /* From register file begin */
     input   logic[`REG_DATA_WIDTH-1:0]  rs1_data_reg,
