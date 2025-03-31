@@ -219,11 +219,11 @@ module core_no_if(
 
     wb wb_stage(
         .rst(rst),
-        .mem_data(mem_data_mem),
-        .alu_data(alu_data_mem),
-        .rd_addr(rd_addr_mem),
-        .reg_write(reg_write_mem),
-        .mem_to_reg(mem_to_reg_mem),
+        .mem_data(mem_data_wb),
+        .alu_data(alu_data_wb),
+        .rd_addr(rd_addr_wb),
+        .reg_write(reg_write_wb),
+        .mem_to_reg(mem_to_reg_wb),
         // outputs
         .reg_wr_en(reg_wr_en_wb),
         .reg_wr_addr(reg_wr_addr_wb),
@@ -256,6 +256,34 @@ module core_no_if(
         .wr_data(dmem_wr_data),
         // output
         .rd_data(dmem_rd_data)
+    );
+
+    forward_unit forward_u(
+        .rst(rst),
+        .rs1_rd_en_ex(rs1_rd_en_ex),
+        .rs2_rd_en_ex(rs2_rd_en_ex),
+        .rs1_addr_ex(rs1_addr_ex),
+        .rs2_addr_ex(rs2_addr_ex),
+        .rd_addr_ex(rd_addr_ex),
+        .rd_addr_mem(rd_addr_mem),
+        .reg_write_mem(reg_write_mem),
+        .rd_addr_wb(rd_addr_wb),
+        .reg_write_wb(reg_write_wb),
+        // outputs
+        .forward_op1(forward_op1_ex),
+        .forward_op2(forward_op2_ex)
+    );
+
+    stall_unit stall_u(
+        .rst(rst),
+        .rs1_rd_en_id(rs1_rd_en_id),
+        .rs2_rd_en_id(rs2_rd_en_id),
+        .rs1_addr_id(rs1_addr_id),
+        .rs2_addr_id(rs2_addr_id),
+        .mem_read_ex(mem_read_ex),
+        .rd_addr_ex(rd_addr_ex),
+        // outputs
+        .stall(stall)
     );
 
 endmodule

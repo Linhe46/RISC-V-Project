@@ -31,11 +31,13 @@ GTKWAVE = gtkwave
 # add wave automatically
 TCL_FILE_ID_TB = id_tb.tcl
 TCL_FILE_EX_TB = ex_tb.tcl
+TCL_FILE_CORE_NO_IF = core_no_if.tcl
 
 # Wave file
 WAVE_ID_TB = wave_dir/id_tb.vcd
 WAVE_EX_TB = wave_dir/ex_tb.vcd
-WAVE = $(WAVE_ID_TB) $(WAVE_EX_TB)
+WAVE_CORE_NO_IF = wave_dir/core_no_if.vcd
+WAVE = $(WAVE_ID_TB) $(WAVE_EX_TB) $(WAVE_CORE_NO_IF)
 
 # Verilator Compiler
 VERILATOR = verilator
@@ -66,6 +68,9 @@ wave_id_tb: $(WAVE_ID_TB) $(TCL_FILE_ID_TB)
 
 wave_ex_tb: $(WAVE_EX_TB) $(TCL_FILE_EX_TB)
 	$(GTKWAVE) -T $(TCL_FILE_EX_TB) $(WAVE_EX_TB)
+
+wave_core_no_if: $(WAVE_CORE_NO_IF) $(TCL_FILE_CORE_NO_IF)
+	$(GTKWAVE) -T $(TCL_FILE_CORE_NO_IF) $(WAVE_CORE_NO_IF)
 
 clean:
 	rm -rf $(OBJ_DIR) $(WAVE)

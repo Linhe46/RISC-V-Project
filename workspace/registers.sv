@@ -30,8 +30,8 @@ module registers(
     always_ff @(posedge clk) begin
         if(rst) begin
             for(int i = 0; i < 32; i++) begin
-                //regfile[i] <= 32'b0;
-                regfile[i] <= regfile_initial[i];
+                regfile[i] <= 32'b0;
+                //regfile[i] <= regfile_initial[i];
             end
         end
         else begin
