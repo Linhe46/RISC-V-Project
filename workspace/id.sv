@@ -243,11 +243,11 @@ module id(
                 end
                 `OP_LUI: begin
                     `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, rd, {U_imm, 12'b0})     // Load upper 20bits
-                    `set_control(`ALU_NOP, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)
+                    `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)        // perform a '0 + imm' operation for WB and forwarding
                 end
                 `OP_AUIPC: begin
                     `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, rd, pc + {U_imm, 12'b0} /* adhoc */)
-                    `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)        // perform a '0 + pc_offset' operation for WB
+                    `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)        // perform a '0 + pc_offset' operation for WB and forwarding
                 end
                 /* branch logic begin */
                 `OP_BRA: begin

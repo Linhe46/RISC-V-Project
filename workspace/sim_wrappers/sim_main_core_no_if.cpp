@@ -19,7 +19,7 @@ u_int32_t pack(const std::string& inst){
     std::bitset<32> binarySet(std::move(filter_separate));
     return binarySet.to_ulong();
 }
-std::vector<std::string> insts{
+std::vector<std::string> insts_mixed{
 // comment format: <ASM_NAME> <rd> <rs1> <rs2>(<imm>) unless specially declared
 //    funct7  rs2   rs1 funct3 rd   opcode
     "0000000_00011_00000_000_00001_0010011", // ADDI    x1, x0, 1   // x1 = 3
@@ -35,6 +35,21 @@ std::vector<std::string> insts{
     "0000000_00011_00011_000_00011_0100011", // SB MEM[x3 + 3] = x3 & MASK_B
     "0000000_00000_00000_111_11111_0110111", // LUI x31 = 7 << 12
     "0000000_00000_01000_101_00001_0000011"  // LHU x1 = MEM[x8 + 0]
+};
+
+std::vector<std::string> insts_r_type{
+    // R type insts to test
+    "0000000_00011_00000_000_00001_0010011", // ADDI    x1, x0, 3   // x1 = 3
+    "0000000_00001_00000_000_00010_0010011", // ADDI    x2, x0, 1   // x2 = 1
+    "0000000_00010_00001_000_00001_0110011", // ADD     x1, x1, x2  // x1 = 4   wb->ex forwarding for x1, mem->ex forwarding for x2
+    "0000000_00001_00001_000_00001_0110011", // ADD     x1, x1, x1  // x1 = 8   mem->ex forwarding for x1
+    "0100000_00010_00001_000_00101_0110011"  // SUB     x5, x1, x2  // x5 = 7
+};
+
+std::vector<std::string> insts_ls_type{
+    // load store insts to test
+    "0000000_00000_00000_100_00011_0110111", // LUI x3 = 4 << 12 = // x3 = 4096*4=16384
+    "0000000_00011_00011_000_00001_0010011" // ADDI    x1, x3, 3   // x1 = x3 + 3  lui-use is R-type hazzard
 };
 
 int main(int argc, char **argv)
@@ -58,6 +73,8 @@ int main(int argc, char **argv)
     top->pc = 0;
     top->inst = 0;
 
+    //auto& insts = insts_r_type;
+    auto& insts = insts_ls_type;
     /* start simulation until reaching finish time */
     /* you can also write a for-loop to run certain times */
     int num_insts = insts.size();
