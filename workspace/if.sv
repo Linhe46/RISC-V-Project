@@ -1,45 +1,36 @@
-//%
-// PC module at IF stage
-// Function:
-// - Select next PC given the branch taken signal
-// - Keep the PC when write signal is low
-// - Fetch the inst from InstMem
 
 `include "defines.sv"
-module PC(
-    input   logic                       clk,
+module if_(
     input   logic                       rst,
-    //input   logic                       PC_write_en,
-    //input   logic                       is_uncon_branch,
-    input   logic[`STALL_WIDTH]         stall,
-    input   logic                       branch_taken,
-    input   logic[`MEM_ADDR_WIDTH-1:0]  branch_addr,
-    output  logic                       rd_en,
-    output  logic[31:0]                 PC_out
+    input   logic[`STALL_WIDTH-1:0]     stall,
+    input   logic[`MEM_ADDR_WIDTH-1:0]  pc_in,
+    input   logic[`REG_DATA_WIDTH-1:0]  inst_imem,
+    //input   logic                       branch_taken, connected to PC directly
+    //input   logic[`MEM_ADDR_WIDTH-1:0]  branch_addr, 
+    output  logic                       pc_wr_en,
+    output  logic                       imem_rd_en,
+    output  logic[`MEM_ADDR_WIDTH-1:0]  pc_out,
+    output  logic[`REG_DATA_WIDTH-1:0]  inst
 );
 
-    // read enable signal for InstMem
-    always_ff @(posedge clk) begin
+    always_comb begin
         if(rst) begin
-            rd_en <= 0;
-            PC_out <= 0;
+            pc_out  =   0;
+            inst    =   0;
         end
-        else
-            rd_en <= 1;  
+        else begin
+            pc_out  =   pc_in;
+            inst    =   inst_imem;
+        end
     end
 
-    // PC update logic
-    logic[31:0] PC_next;
-    always_ff @(posedge clk) begin
-        if(rst)
-            PC_out <= 32'b0;
-        else if(stall == `STALL_LOAD)   // re-fetch the instruction
-            PC_out <= PC_out;
+    always_comb begin
+        if(rst || stall == `STALL_LOAD)
+            pc_wr_en = 0;
         else
-            PC_out <= PC_next;
+            pc_wr_en = 1;
     end
 
-    assign PC_next = branch_taken ? branch_addr : PC_out + 4;
-
+    assign imem_rd_en = 1;  // always read inst
 
 endmodule

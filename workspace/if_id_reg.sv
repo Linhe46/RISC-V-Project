@@ -23,7 +23,7 @@ module if_id_reg(
         end
         else begin
             PC_id   <= PC_if;
-            inst_id <= stall == `STALL_BRANCH ? 32'b0 : inst_if;
+            inst_id <= stall == `STALL_BRANCH ? 32'b0 : inst_if; // flush the fetched inst
         end
     end
 
