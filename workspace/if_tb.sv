@@ -28,7 +28,7 @@ module if_tb(
         .inst(inst_if)
     );
 
-    PC pc_reg(
+    PC pc_u(
         .clk(clk),
         .rst(rst),
         .wr_en(pc_wr_en),
