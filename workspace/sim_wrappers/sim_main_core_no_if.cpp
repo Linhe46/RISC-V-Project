@@ -49,7 +49,10 @@ std::vector<std::string> insts_r_type{
 std::vector<std::string> insts_ls_type{
     // load store insts to test
     "0000000_00000_00000_100_00011_0110111", // LUI x3 = 4 << 12 = // x3 = 4096*4=16384
-    "0000000_00011_00011_000_00001_0010011" // ADDI    x1, x3, 3   // x1 = x3 + 3  lui-use is R-type hazzard
+    "0000000_00011_00011_000_00001_0010011", // ADDI    x1, x3, 3   // x1 = x3 + 3 = 16387  lui-use is R-type hazzard
+    "0000000_00001_00000_000_00010_0010011", // ADDI    x2, x0, 1   // x1 = 1
+    "0000000_00010_00010_101_01000_0000011", // LHU  x8 = MEM[x2 + 2] = MEM[3]   // R-type hazzard
+    "0000000_00001_01000_000_00100_0110011"  // ADD     x4 = x8 + x1 // load use hazzard
 };
 
 int main(int argc, char **argv)

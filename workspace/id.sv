@@ -84,7 +84,7 @@ module id(
     logic[31:0] pc_bra  = pc + sext_shift_B_imm;
     logic[31:0] pc_jal  = pc + sext_shift_J_imm;
     //logic[31:0] pc_jalr = rs1_data_reg + sext_shift_J_imm;  // this is a bug
-    logic[31:0] pc_jalr = rs1_data_reg + {{20{I_imm[11]}}, I_imm} & ~1;   // need to set the LSB to 0
+    logic[31:0] pc_jalr = rs1_data_reg + {{20{I_imm[11]}}, I_imm} & ~(32'd1);   // set the LSB to 0
 
     // branch if taken
     logic rs1_eq_rs2    =     rs2_data_reg == rs1_data_reg;
