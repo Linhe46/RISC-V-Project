@@ -7,23 +7,27 @@
 
 `include "defines.sv"
 module if_id_reg(
-    input   logic           clk,
-    input   logic           rst,
-    input   logic[5:0]      stall,
-    input   logic[31:0]     PC_if,
-    input   logic[31:0]     inst_if,
-    output  logic[31:0]     PC_id,
-    output  logic[31:0]     inst_id
+    input   logic                       clk,
+    input   logic                       rst,
+    input   logic[`STALL_WIDTH-1:0]     stall,
+    input   logic[`MEM_ADDR_WIDTH-1:0]  PC_if,
+    input   logic[`REG_DATA_WIDTH-1:0]  inst_if,
+    output  logic[`MEM_ADDR_WIDTH-1:0]  PC_id,
+    output  logic[`REG_DATA_WIDTH-1:0]  inst_id
 );
     // pass PC and inst
     always_ff @(posedge clk) begin
         if(rst) begin
-            PC_id   <= 0;
-            inst_id <= 0;
+            PC_id   <=  0;
+            inst_id <=  0;
+        end
+        else if(stall == `STALL_LOAD) begin // preserve the fetched inst and pc 
+            PC_id   <=  PC_id;
+            inst_id <=  inst_id;
         end
         else begin
-            PC_id   <= PC_if;
-            inst_id <= stall == `STALL_BRANCH ? 32'b0 : inst_if; // flush the fetched inst
+            PC_id   <=  PC_if;
+            inst_id <=  (stall == `STALL_BRANCH) ? 32'b0 : inst_if; // flush the fetched inst
         end
     end
 
