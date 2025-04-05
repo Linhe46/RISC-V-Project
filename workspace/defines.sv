@@ -8,8 +8,9 @@
 // Definitions For Stall Types
 `define STALL_WIDTH     5
 `define STALL_NOP       5'd0
-`define STALL_BRANCH    5'b00001
-`define STALL_LOAD      5'b00011
+//`define BRANCH_FLUSH    5'd1  // stall IF stage, flush ID stage 
+`define STALL_BRANCH    5'd2  // stall ID stage and IF stage
+`define STALL_LOAD      5'd3    // stall ID stage and IF stage
 
 /* Some frequently used signals */
 `define REG_DATA_ZERO       32'b0

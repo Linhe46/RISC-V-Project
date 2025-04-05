@@ -10,7 +10,8 @@ V_SRCS_ID = id.sv registers.sv id_ex_reg.sv
 V_SRCS_EX = ex.sv ex_mem_reg.sv
 V_SRCS_MEM = mem.sv data_memory.sv mem_wb_reg.sv
 V_SRCS_WB = wb.sv
-V_SRCS_CORE = core.sv $(V_SRCS_IF) $(V_SRCS_ID) $(V_SRCS_EX) $(V_SRCS_MEM) $(V_SRCS_WB)
+V_SRCS_CTRL = stall_unit.sv forward_unit.sv
+V_SRCS_CORE = core.sv $(V_SRCS_IF) $(V_SRCS_ID) $(V_SRCS_EX) $(V_SRCS_MEM) $(V_SRCS_WB) $(V_SRCS_CTRL)
 
 # Simulation src files
 SIM_SRCS_CORE = $(SIM_DIR)/sim_main_core.cpp
@@ -37,7 +38,7 @@ WAVE = $(WAVE_CORE)
 VERILATOR = verilator
 
 # Compiling Options
-VERILATOR_FLAGS = -cc --exe --build --trace
+VERILATOR_FLAGS = -cc --exe --build --trace -I/.
 
 core: $(V_SRCS_CORE) $(SIM_SRCS_CORE) $(MEM_TXT)
 	$(VERILATOR) $(VERILATOR_FLAGS) $(V_SRCS_CORE) $(SIM_SRCS_CORE)

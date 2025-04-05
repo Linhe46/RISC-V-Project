@@ -10,6 +10,7 @@ module if_id_reg(
     input   logic                       clk,
     input   logic                       rst,
     input   logic[`STALL_WIDTH-1:0]     stall,
+    input   logic                       branch_taken,   // flush for predict_untaken
     input   logic[`MEM_ADDR_WIDTH-1:0]  PC_if,
     input   logic[`REG_DATA_WIDTH-1:0]  inst_if,
     output  logic[`MEM_ADDR_WIDTH-1:0]  PC_id,
@@ -21,13 +22,13 @@ module if_id_reg(
             PC_id   <=  0;
             inst_id <=  0;
         end
-        else if(stall == `STALL_LOAD) begin // preserve the fetched inst and pc 
+        else if(stall == `STALL_LOAD || stall == `STALL_BRANCH) begin // preserve the fetched inst and pc 
             PC_id   <=  PC_id;
             inst_id <=  inst_id;
         end
         else begin
             PC_id   <=  PC_if;
-            inst_id <=  (stall == `STALL_BRANCH) ? 32'b0 : inst_if; // flush the fetched inst
+            inst_id <=  branch_taken ? 32'b0 : inst_if; // flush the fetched inst
         end
     end
 

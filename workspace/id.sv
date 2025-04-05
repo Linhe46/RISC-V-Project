@@ -9,25 +9,28 @@
 /* verilator lint_off WIDTHEXPAND */
 `include "defines.sv"
 module id(
-    input       logic          rst,
+    input       logic           rst,
     input       logic[`STALL_WIDTH-1:0]     stall,
-    input       logic[31:0]    pc,
-    input       logic[31:0]    inst,
+    input       logic[31:0]     pc,
+    input       logic[31:0]     inst,
     /*  rs1 and rs2 data are used only in branch/jump */
-    input       logic[31:0]    rs1_data_reg,
-    input       logic[31:0]    rs2_data_reg,
+    input       logic[31:0]     rs1_data_reg,
+    input       logic[31:0]     rs2_data_reg,    
+    // forwarding logic for early branch
+    input   logic[`FORWARD_WIDTH-1:0]   forward_op1,
+    input   logic[`FORWARD_WIDTH-1:0]   forward_op2,
+    input   logic[`REG_DATA_WIDTH-1:0]  forward_data_mem,
+    input   logic[`REG_DATA_WIDTH-1:0]  forward_data_wb,
     
     output      logic           rs1_rd_en,
     output      logic           rs2_rd_en,
-    //output    logic           rd_wr_en,    // replaced by reg_write signal
 
     output      logic[4:0]      rs1_addr,
     output      logic[4:0]      rs2_addr,
     output      logic[4:0]      rd_addr,
-    //output    logic[31:0]    rs1_data,        send to ID/EX from registers
-    //output    logic[31:0]    rs2_data,
     output      logic[31:0]     imm,
     /* branch judge output */
+    output      logic           is_branch, // forwarding control
     output      logic           branch_taken,
     output      logic[31:0]     branch_addr,
     //output    logic[31:0]    link_addr,
@@ -87,37 +90,27 @@ module id(
     logic[31:0] pc_jalr = rs1_data_reg + {{20{I_imm[11]}}, I_imm} & ~(32'd1);   // set the LSB to 0
 
     // branch if taken
-    logic rs1_eq_rs2    =     rs2_data_reg == rs1_data_reg;
-    logic rs1_ne_rs2    =     rs2_data_reg != rs1_data_reg;
+    logic[`REG_DATA_WIDTH-1:0] bra_op1;
+    logic[`REG_DATA_WIDTH-1:0] bra_op2;
+    assign bra_op1 = (forward_op1 == `FORWARD_MEM)    ? forward_data_mem  :
+                     (forward_op1 == `FORWARD_WB)     ? forward_data_wb   :   rs1_data_reg;
+    assign bra_op2 = (forward_op2 == `FORWARD_MEM)    ? forward_data_mem  :
+                     (forward_op2 == `FORWARD_WB)     ? forward_data_wb   :   rs2_data_reg;
+
+    logic rs1_eq_rs2    =     bra_op1 == bra_op2;
+    logic rs1_ne_rs2    =     bra_op1 != bra_op2;
     function signed_lt;
         input [31:0] rs1, rs2;
         logic res;
         if(rs1[31] != rs2[31]) res = rs1[31];
         else res = rs1 < rs2;
     endfunction
-    logic rs1_lt_rs2    =   signed_lt(rs1_data_reg, rs2_data_reg); 
-    logic rs1_ge_rs2    =  ~signed_lt(rs1_data_reg, rs2_data_reg);
-    logic rs1_ltu_rs2   =   rs1_data_reg < rs2_data_reg;
-    logic rs1_geu_rs2   =  ~(rs1_data_reg < rs2_data_reg);
-
-    /* branch unit */
-    // need forwarding
+    logic rs1_lt_rs2    =   signed_lt(bra_op1, bra_op2); 
+    logic rs1_ge_rs2    =  ~signed_lt(bra_op1, bra_op2);
+    logic rs1_ltu_rs2   =   bra_op1 < bra_op2;
+    logic rs1_geu_rs2   =  ~(bra_op1 < bra_op2);
 
     // assignment macro
-    /*
-    `define set_output(rs1_addr_, rs2_addr_, rd_addr_, rs1_data_, rs2_data_, alu_op_, alu_src_, mem_read_, mem_write, reg_write_, mem_to_reg_)    \
-        rs1_addr    =   rs1_addr_;      \
-        rs2_addr    =   rs2_addr_;      \
-        rd_addr     =   rd_addr_;       \
-        rs1_data    =   rs1_data_;      \
-        rs2_data    =   rs2_data_;      \
-        alu_op      =   alu_op_;        \
-        alu_src     =   alu_src_;       \
-        mem_read    =   mem_read_;      \
-        mem_write   =   mem_write_;     \
-        reg_write   =   reg_write_;     \
-        mem_to_reg  =   mem_to_reg_;    
-    */
     `define set_regimm(rs1_rd_en_, rs2_rd_en_, rs1_addr_, rs2_addr_, rd_addr_, imm_)     \
         rs1_rd_en   =   rs1_rd_en_;     \
         rs2_rd_en   =   rs2_rd_en_;     \
@@ -134,7 +127,8 @@ module id(
         unsigned_load   =   unsigned_load_;     \
         reg_write       =   reg_write_;         \
         mem_to_reg      =   mem_to_reg_;    
-    `define set_branch(branch_taken_, branch_addr_)     \
+    `define set_branch(is_branch_, branch_taken_, branch_addr_)     \
+        is_branch       =       is_branch_;         \
         branch_taken    =       branch_taken_;      \
         branch_addr     =       branch_addr_;
 
@@ -143,12 +137,12 @@ module id(
         if(rst) begin
             `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, `REG_ADDR_ZERO, `REG_DATA_ZERO)
             `set_control(`ALU_NOP, `ALU_SRC_RS2, 0, 0, `MASK_W, 0, 0, 0)
-            `set_branch(0, `MEM_ADDR_ZERO)
+            `set_branch(0, 0, `MEM_ADDR_ZERO)
         end
         else begin
             `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, `REG_ADDR_ZERO, `REG_DATA_ZERO)
             `set_control(`ALU_NOP, 0, 0, 0, `MASK_W, 0, 0, 0)
-            `set_branch(0, `MEM_ADDR_ZERO)
+            `set_branch(0, 0, `MEM_ADDR_ZERO)
             case(opcode)
                 `OP_ALU: begin
                     `set_regimm(1, 1, rs1, rs2, rd, `REG_DATA_ZERO)
@@ -255,27 +249,27 @@ module id(
                     case(funct3)
                         `FUNCT3_BEQ: begin
                             `set_control(`ALU_NOP, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 0, 0)
-                            `set_branch(rs1_eq_rs2, pc_bra)
+                            `set_branch(1, rs1_eq_rs2, pc_bra)
                         end
                         `FUNCT3_BNE: begin
                             `set_control(`ALU_NOP, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 0, 0)
-                            `set_branch(rs1_ne_rs2, pc_bra)
+                            `set_branch(1, rs1_ne_rs2, pc_bra)
                         end
                         `FUNCT3_BLT: begin
                             `set_control(`ALU_NOP, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 0, 0)
-                            `set_branch(rs1_lt_rs2, pc_bra)
+                            `set_branch(1, rs1_lt_rs2, pc_bra)
                         end
                         `FUNCT3_BGE: begin
                             `set_control(`ALU_NOP, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 0, 0)
-                            `set_branch(rs1_ge_rs2, pc_bra)
+                            `set_branch(1, rs1_ge_rs2, pc_bra)
                         end
                         `FUNCT3_BLTU: begin
                             `set_control(`ALU_NOP, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 0, 0)
-                            `set_branch(rs1_ltu_rs2, pc_bra)
+                            `set_branch(1, rs1_ltu_rs2, pc_bra)
                         end
                         `FUNCT3_BGEU: begin
                             `set_control(`ALU_NOP, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 0, 0)
-                            `set_branch(rs1_geu_rs2, pc_bra)
+                            `set_branch(1, rs1_geu_rs2, pc_bra)
                         end
                         default: begin end
                     endcase
@@ -285,14 +279,14 @@ module id(
                 `OP_JAL: begin
                     `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, rd, pc_next)
                     `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)
-                    `set_branch(1, pc_jal)
+                    `set_branch(1, 1, pc_jal)
                 end
                 `OP_JALR: begin
                     case(funct3)
                         `FUNCT3_JALR: begin
                             `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, rd, pc_next)
                             `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)
-                            `set_branch(1, pc_jalr)
+                            `set_branch(1, 1, pc_jalr)
                         end
                         default: begin end
                     endcase

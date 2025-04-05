@@ -31,8 +31,11 @@ module core(
     logic[`REG_ADDR_WIDTH-1:0]  rs2_addr_id;
     logic[`REG_ADDR_WIDTH-1:0]  rd_addr_id;
     logic[`REG_DATA_WIDTH-1:0]  imm_id;
+    logic                       is_branch_id;
     logic                       branch_taken_id;
     logic[`MEM_ADDR_WIDTH-1:0]  branch_addr_id;
+    logic[`FORWARD_WIDTH-1:0]   forward_op1_id;
+    logic[`FORWARD_WIDTH-1:0]   forward_op2_id;
     logic[`ALU_OP_WIDTH-1:0]    alu_op_id;
     logic                       alu_src_id;
     logic                       mem_read_id;
@@ -48,8 +51,8 @@ module core(
     logic[`REG_DATA_WIDTH-1:0]  imm_ex;
     logic[`FORWARD_WIDTH-1:0]   forward_op1_ex;
     logic[`FORWARD_WIDTH-1:0]   forward_op2_ex;
-    logic[`REG_DATA_WIDTH-1:0]  forward_data_mem;   // from mem stage
-    logic[`REG_DATA_WIDTH-1:0]  forward_data_wb;    // from wb stage
+    //logic[`REG_DATA_WIDTH-1:0]  forward_data_mem;   
+    //logic[`REG_DATA_WIDTH-1:0]  forward_data_wb; moved to mem and wb, for id also use them
     logic[`ALU_OP_WIDTH-1:0]    alu_op_ex;
     logic                       alu_src_ex;
     logic[`REG_DATA_WIDTH-1:0]  alu_res_ex;
@@ -85,7 +88,7 @@ module core(
     // memory signals end
     logic[`REG_DATA_WIDTH-1:0]  mem_data_mem;
     logic[`REG_DATA_WIDTH-1:0]  alu_data_mem;
-    // forward_data_mem has been defined
+    logic[`REG_DATA_WIDTH-1:0]  forward_data_mem;   // from mem stage
 
     /* ex/mem pipeline regfile bypass to mem/wb*/
     logic[`REG_ADDR_WIDTH-1:0]  rd_addr_mem;
@@ -102,6 +105,7 @@ module core(
     logic                       reg_wr_en_wb;
     logic[`REG_ADDR_WIDTH-1:0]  reg_wr_addr_wb;
     logic[`REG_DATA_WIDTH-1:0]  reg_wr_data_wb;
+    logic[`REG_DATA_WIDTH-1:0]  forward_data_wb;    // from wb stage
     // reg file signals begin
 
     /* no bypass at mem/wb pipeline regfile */
@@ -122,6 +126,7 @@ module core(
         .clk(clk),
         .rst(rst),
         .stall(stall),
+        .branch_taken(branch_taken_id),
         .PC_if(pc_if),
         .inst_if(inst_if),
         // outputs
@@ -137,6 +142,10 @@ module core(
         .inst(inst_id),
         .rs1_data_reg(rs1_data_reg),
         .rs2_data_reg(rs2_data_reg),
+        .forward_op1(forward_op1_id),
+        .forward_op2(forward_op2_id),
+        .forward_data_mem(forward_data_mem),
+        .forward_data_wb(forward_data_wb),
         // outputs
         .rs1_rd_en(rs1_rd_en_id),
         .rs2_rd_en(rs2_rd_en_id),
@@ -144,6 +153,7 @@ module core(
         .rs2_addr(rs2_addr_id),
         .rd_addr(rd_addr_id),
         .imm(imm_id),
+        .is_branch(is_branch_id),
         .branch_taken(branch_taken_id),
         .branch_addr(branch_addr_id),
         .alu_op(alu_op_id),
@@ -328,13 +338,13 @@ module core(
         .rd_data(dmem_rd_data)
     );
 
-    forward_unit forward_u(
+    forward_unit_ex forward_ex_u(
         .rst(rst),
         .rs1_rd_en_ex(rs1_rd_en_ex),
         .rs2_rd_en_ex(rs2_rd_en_ex),
         .rs1_addr_ex(rs1_addr_ex),
         .rs2_addr_ex(rs2_addr_ex),
-        .rd_addr_ex(rd_addr_ex),
+        //.rd_addr_ex(rd_addr_ex),
         .rd_addr_mem(rd_addr_mem),
         .reg_write_mem(reg_write_mem),
         .rd_addr_wb(rd_addr_wb),
@@ -344,14 +354,34 @@ module core(
         .forward_op2(forward_op2_ex)
     );
 
+    forward_unit_id forward_id_u(
+        .rst(rst),
+        .is_branch(is_branch_id),
+        .rs1_rd_en_id(rs1_rd_en_id),
+        .rs2_rd_en_id(rs2_rd_en_id),
+        .rs1_addr_id(rs1_addr_id),
+        .rs2_addr_id(rs2_addr_id),
+        .rd_addr_mem(rd_addr_mem),
+        .reg_write_mem(reg_write_mem),
+        .rd_addr_wb(rd_addr_wb),
+        .reg_write_wb(reg_write_wb),
+        // outputs
+        .forward_op1(forward_op1_id),
+        .forward_op2(forward_op2_id)
+    );
+
     stall_unit stall_u(
         .rst(rst),
+        .is_branch(is_branch_id),
         .rs1_rd_en_id(rs1_rd_en_id),
         .rs2_rd_en_id(rs2_rd_en_id),
         .rs1_addr_id(rs1_addr_id),
         .rs2_addr_id(rs2_addr_id),
         .mem_read_ex(mem_read_ex),
+        .mem_read_mem(mem_read_mem),
+        .reg_write_ex(reg_write_ex),
         .rd_addr_ex(rd_addr_ex),
+        .rd_addr_mem(rd_addr_mem),
         // outputs
         .stall(stall)
     );

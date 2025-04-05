@@ -25,7 +25,7 @@ module if_(
     end
 
     always_comb begin
-        if(rst || stall == `STALL_LOAD)
+        if(rst || stall == `STALL_LOAD || stall == `STALL_BRANCH)
             pc_wr_en = 0;
         else
             pc_wr_en = 1;
