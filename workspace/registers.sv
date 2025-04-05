@@ -20,18 +20,13 @@ module registers(
     output logic[31:0] rd2_data
 );
 
-    logic[31:0] regfile_initial[0:31];
     logic[31:0] regfile[0:31];
-    initial begin
-        $readmemb("registers.txt", regfile_initial);
-    end
 
     /* write logic */
     always_ff @(posedge clk) begin
         if(rst) begin
             for(int i = 0; i < 32; i++) begin
                 regfile[i] <= 32'b0;
-                //regfile[i] <= regfile_initial[i];
             end
         end
         else begin
