@@ -29,6 +29,7 @@ EXE_CORE = obj_dir/Vcore
 GTKWAVE = gtkwave
 
 # add wave automatically
+CORE_TCL = core.tcl
 
 # Wave file
 WAVE_CORE = wave_dir/core.vcd
@@ -40,13 +41,21 @@ VERILATOR = verilator
 # Compiling Options
 VERILATOR_FLAGS = -cc --exe --build --trace -I/.
 
+IMEM_GEN_ENABLE ?= true
+
 core: $(V_SRCS_CORE) $(SIM_SRCS_CORE) $(MEM_TXT)
+ifeq ($(IMEM_GEN_ENABLE), true)
+	$(MAKE) imem_gen --no-print-directory -C ./data_gen -f Makefile
+	@echo "\033[1;32mIMEM_GEN_ENABLE is true, write new instructions to inst_mem and run..\033[0m"
+else
+	@echo "\033[1;32mIMEM_GEN_ENABLE is false, run instructions in the inst_mem..\033[0m"
+endif
 	$(VERILATOR) $(VERILATOR_FLAGS) $(V_SRCS_CORE) $(SIM_SRCS_CORE)
-	$(EXE_CORE)
+	@$(EXE_CORE)
 
 #$(GTKWAVE) -T $(TCL_FILE...) $(WAVE_FILE...)
 wave_core: $(WAVE_CORE)
-	$(GTKWAVE)  $(WAVE_CORE)
+	$(GTKWAVE) -T $(CORE_TCL) $(WAVE_CORE)
 
 clean:
 	rm -rf $(OBJ_DIR) $(WAVE)

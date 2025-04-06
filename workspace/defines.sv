@@ -138,7 +138,7 @@
 `define DATA_MEM_SIZE           4096        // cell size
 `define DATA_MEM_SIZE_WIDTH     $clog2(`DATA_MEM_SIZE)    // cell size width
 
-`define INST_MEM_SIZE           8
+`define INST_MEM_SIZE           16
 `define INST_MEM_SIZE_WIDTH     $clog2(`INST_MEM_SIZE)
 
 `endif

@@ -7,10 +7,12 @@
 #include <unordered_map>
 #include <algorithm>
 #include <string>
-#define INST_MEM_SIZE 8
+#define INST_MEM_SIZE 16
+
+using InstSet = std::vector<std::pair<std::string, std::string>>;
 
 // (inst, comment) pairs for debugging
-std::vector<std::pair<std::string, std::string>> insts_ls{
+InstSet insts_ls{
     {"0000000_00000_00000_100_00011_0110111",
         "// LUI x3 = 4 << 12 = // x3 = 4096*4=16384"},
     {"0000000_00011_00011_000_00001_0010011", 
@@ -22,6 +24,20 @@ std::vector<std::pair<std::string, std::string>> insts_ls{
     {"0000000_00001_01000_000_00100_0110011",
         "// ADD x4 = x8 + x1 // load use hazzard"}
 };
+
+InstSet insts_bra{
+    {"0000000_00011_00010_000_00010_0010011", 
+        "// ADDI x2, x0, 3 // x2 = x2 + 3"},
+    {"0000000_00001_00001_000_00001_0010011", 
+        "// ADDI x1, x1, 1 // x1 = x1 + 1 "},
+    {"0000000_00001_00001_000_00001_0010011", 
+        "// ADDI x1, x1, 1 // x1 = x1 + 1 "},
+    //{"1111111_00010_00001_000_11101_1100011",
+    //    "// BEQ x1 x2, offset = -2 << 1"}
+    {"1111111_00010_00001_001_11101_1100011",
+        "// BNE x1 x2, offset = -2 << 1"}
+};
+
 std::string zero_inst = "0000000_00000_00000_000_00000_0000000";
 
 std::string trans_to_hex(std::string inst){
@@ -30,7 +46,7 @@ std::string trans_to_hex(std::string inst){
         throw std::runtime_error("Malformed binary instruction !");
     unsigned long decimalValue = std::stoul(inst, nullptr, 2); // to decimal
     std::stringstream ss;
-    ss << std::hex << std::setfill('0') << std::setw(8) << decimalValue;
+    ss << std::hex << std::uppercase << std::setfill('0') << std::setw(8) << decimalValue;
     // return hex format
     return ss.str();
 }
@@ -43,7 +59,7 @@ int main() {
         return 1;
     }
 
-    auto& insts = insts_ls;
+    auto& insts = insts_bra;
     auto insts_num = insts.size();
     try{
         for(int i = 0; i < INST_MEM_SIZE; i++) {
