@@ -137,7 +137,6 @@ module core(
     id id_stage(
         // inputs
         .rst(rst),
-        .stall(stall),
         .pc(pc_id),
         .inst(inst_id),
         .rs1_data_reg(rs1_data_reg),

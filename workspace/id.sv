@@ -10,7 +10,6 @@
 `include "defines.sv"
 module id(
     input       logic           rst,
-    input       logic[`STALL_WIDTH-1:0]     stall,
     input       logic[31:0]     pc,
     input       logic[31:0]     inst,
     /*  rs1 and rs2 data are used only in branch/jump */
@@ -78,16 +77,6 @@ module id(
 
     /* next PC */
     logic[31:0] pc_next = pc + 4; 
-    /* branch signals generation */
-    /*
-    logic[31:0] pc_bra    = pc + {{19{B_imm[12]}}, B_imm};
-    logic[31:0] pc_jal  = pc + sext_J_imm;
-    logic[31:0] pc_jalr    = rs1_data_reg + {{11{J_imm[20]}}, J_imm};
-    */
-    logic[31:0] pc_bra  = pc + sext_shift_B_imm;
-    logic[31:0] pc_jal  = pc + sext_shift_J_imm;
-    //logic[31:0] pc_jalr = rs1_data_reg + sext_shift_J_imm;  // this is a bug
-    logic[31:0] pc_jalr = rs1_data_reg + {{20{I_imm[11]}}, I_imm} & ~(32'd1);   // set the LSB to 0
 
     // branch if taken
     logic[`REG_DATA_WIDTH-1:0] bra_op1;
@@ -109,6 +98,18 @@ module id(
     logic rs1_ge_rs2    =  ~signed_lt(bra_op1, bra_op2);
     logic rs1_ltu_rs2   =   bra_op1 < bra_op2;
     logic rs1_geu_rs2   =  ~(bra_op1 < bra_op2);
+
+    /* branch signals generation */
+    /*
+    logic[31:0] pc_bra    = pc + {{19{B_imm[12]}}, B_imm};
+    logic[31:0] pc_jal  = pc + sext_J_imm;
+    logic[31:0] pc_jalr    = rs1_data_reg + {{11{J_imm[20]}}, J_imm};
+    */
+    logic[31:0] pc_bra;
+    assign pc_bra = pc + sext_shift_B_imm;
+    logic[31:0] pc_jal  = pc + sext_shift_J_imm;
+    //logic[31:0] pc_jalr = rs1_data_reg + {{20{I_imm[11]}}, I_imm} & ~(32'd1);   // set the LSB to 0
+    logic[31:0] pc_jalr = bra_op1 + {{20{I_imm[11]}}, I_imm} & ~(32'd1);   // set the LSB to 0
 
     // assignment macro
     `define set_regimm(rs1_rd_en_, rs2_rd_en_, rs1_addr_, rs2_addr_, rd_addr_, imm_)     \
