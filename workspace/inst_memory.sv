@@ -13,7 +13,7 @@ module inst_memory(
     input   logic[31:0] addr,   // address from PC
     output  logic[31:0] inst
 );
-    logic[31:0] inst_memory[0:`INST_MEM_SIZE-1];    // 32bit cell memory
+    logic[`INST_MEM_DATA_WIDTH-1:0] inst_memory[0:`INST_MEM_SIZE-1];    // 32bit cell memory
 
     // load instructions from files 
     initial begin

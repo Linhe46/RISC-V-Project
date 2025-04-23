@@ -135,9 +135,10 @@
 
 /*========================= Memory Condfig Params =========================*/
 `define DATA_MEM_DATA_WIDTH     32          // cell width  
-`define DATA_MEM_SIZE           4096        // cell size
+`define DATA_MEM_SIZE           32        // cell size
 `define DATA_MEM_SIZE_WIDTH     $clog2(`DATA_MEM_SIZE)    // cell size width
 
+`define INST_MEM_DATA_WIDTH     32
 `define INST_MEM_SIZE           16
 `define INST_MEM_SIZE_WIDTH     $clog2(`INST_MEM_SIZE)
 

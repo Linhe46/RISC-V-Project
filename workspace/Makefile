@@ -42,6 +42,7 @@ VERILATOR = verilator
 VERILATOR_FLAGS = -cc --exe --build --trace -I/.
 
 IMEM_GEN_ENABLE ?= true
+DATA_GEN_ENABLE ?= false
 
 core: $(V_SRCS_CORE) $(SIM_SRCS_CORE) $(MEM_TXT)
 ifeq ($(IMEM_GEN_ENABLE), true)
@@ -49,6 +50,12 @@ ifeq ($(IMEM_GEN_ENABLE), true)
 	@echo "\033[1;32mIMEM_GEN_ENABLE is true, write new instructions to inst_mem and run..\033[0m"
 else
 	@echo "\033[1;32mIMEM_GEN_ENABLE is false, run instructions in the inst_mem..\033[0m"
+endif
+ifeq ($(DATA_GEN_ENABLE), true)
+	$(MAKE) dmem_gen --no-print-directory -C ./data_gen -f Makefile
+	@echo "\033[1;32mDMEM_GEN_ENABLE is true, write new data to data_mem and run..\033[0m"
+else
+	@echo "\033[1;32mDMEM_GEN_ENABLE is false, use data in the data_mem..\033[0m"
 endif
 	$(VERILATOR) $(VERILATOR_FLAGS) $(V_SRCS_CORE) $(SIM_SRCS_CORE)
 	@$(EXE_CORE)
