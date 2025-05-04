@@ -13,6 +13,16 @@ module ex_mem_reg(
     input   logic[`MASK_WIDTH-1:0]      mask_ex, 
     input   logic                       unsigned_load_ex,
     input   logic                       reg_write_ex,
+
+    // if has inst ?
+    input       logic                       has_inst_ex,
+    // if has inst, what's the pc ?
+    input       logic[`REG_DATA_WIDTH-1:0]  inst_pc_ex,
+    // if has inst ?
+    output      logic                       has_inst_mem,
+    // if has inst, what's the pc ?
+    output      logic[`REG_DATA_WIDTH-1:0]  inst_pc_mem,
+
     input   logic                       mem_to_reg_ex,
 
     // memory address & data
@@ -40,6 +50,9 @@ module ex_mem_reg(
             unsigned_load_mem   <=      0;
             reg_write_mem       <=      0;
             mem_to_reg_mem      <=      0;
+
+            has_inst_mem        <=      0;
+            inst_pc_mem         <=      `REG_DATA_ZERO;
         end
         else begin
             alu_res_mem         <=      alu_res_ex;
@@ -51,6 +64,9 @@ module ex_mem_reg(
             unsigned_load_mem   <=      unsigned_load_ex;
             reg_write_mem       <=      reg_write_ex;
             mem_to_reg_mem      <=      mem_to_reg_ex;
+
+            has_inst_mem        <=      has_inst_ex;
+            inst_pc_mem         <=      inst_pc_ex;
         end
     end
 endmodule

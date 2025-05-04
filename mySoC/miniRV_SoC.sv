@@ -124,6 +124,16 @@ module myCPU (
     // reg file signals begin
 
     /* no bypass at mem/wb pipeline regfile */
+    // if has inst ?
+    logic                       has_inst_id;
+    logic                       has_inst_ex;
+    logic                       has_inst_mem;
+    logic                       has_inst_wb;
+    // If has inst, what's the PC ?
+    logic[`REG_DATA_WIDTH-1:0]  inst_pc_id;
+    logic[`REG_DATA_WIDTH-1:0]  inst_pc_ex;
+    logic[`REG_DATA_WIDTH-1:0]  inst_pc_mem;
+    logic[`REG_DATA_WIDTH-1:0]  inst_pc_wb;
 
     if_ if_stage(
         .rst(rst),
@@ -146,8 +156,11 @@ module myCPU (
         .inst_if(inst_if),
         // outputs
         .PC_id(pc_id),
-        .inst_id(inst_id)
+        .inst_id(inst_id),
+
+        .has_inst_id(has_inst_id)
     );
+    assign inst_pc_id = pc_id;
 
     id id_stage(
         // inputs
@@ -216,7 +229,12 @@ module myCPU (
         .mask_ex(mask_ex),
         .unsigned_load_ex(unsigned_load_ex),
         .reg_write_ex(reg_write_ex),
-        .mem_to_reg_ex(mem_to_reg_ex)
+        .mem_to_reg_ex(mem_to_reg_ex),
+
+        .has_inst_id(has_inst_id),
+        .inst_pc_id(inst_pc_id),
+        .has_inst_ex(has_inst_ex),
+        .inst_pc_ex(inst_pc_ex)
     );
 
     ex ex_stage(
@@ -255,7 +273,12 @@ module myCPU (
         .mask_mem(mask_mem),
         .unsigned_load_mem(unsigned_load_mem),
         .reg_write_mem(reg_write_mem),
-        .mem_to_reg_mem(mem_to_reg_mem)
+        .mem_to_reg_mem(mem_to_reg_mem),
+
+        .has_inst_ex(has_inst_ex),
+        .inst_pc_ex(inst_pc_ex),
+        .has_inst_mem(has_inst_mem),
+        .inst_pc_mem(inst_pc_mem)
     );
 
     mem mem_stage(
@@ -292,7 +315,12 @@ module myCPU (
         .alu_data_wb(alu_data_wb),
         .rd_addr_wb(rd_addr_wb),
         .reg_write_wb(reg_write_wb),
-        .mem_to_reg_wb(mem_to_reg_wb)
+        .mem_to_reg_wb(mem_to_reg_wb),
+
+        .has_inst_mem(has_inst_mem),
+        .inst_pc_mem(inst_pc_mem),
+        .has_inst_wb(has_inst_wb),
+        .inst_pc_wb(inst_pc_wb)
     );
 
     wb wb_stage(
@@ -333,13 +361,21 @@ module myCPU (
         .rd2_data(rs2_data_reg)
     );
 
+// --------- Using provided IP cores to replace handcraft mems ----------
+/*
     inst_memory imem(
         .rd_en(imem_rd_en),
         .addr(pc_if),
         // outputs
         .inst(inst_imem)
     );
+*/
+    IROM irom(
+        .a(pc_if),
+        .spo(inst_imem)
+    );
 
+/*
     data_memory dmem(
         .clk(clk),
         .rst(rst),
@@ -350,6 +386,14 @@ module myCPU (
         .wr_data(dmem_wr_data),
         // output
         .rd_data(dmem_rd_data)
+    );
+*/
+    DRAM dmem(
+        .clk(clk),
+        .a(dmem_addr),
+        .we(dmem_wr_en),
+        .d(dmem_wr_data),
+        .spo(dmem_rd_data)
     );
 
     forward_unit_ex forward_ex_u(
@@ -399,12 +443,11 @@ module myCPU (
         // outputs
         .stall(stall)
     );
-
     // TODO: 完成你自己的单周期CPU设计
     
     // Debug Interface
-    assign debug_wb_have_inst = ;
-    assign debug_wb_pc        = ;
+    assign debug_wb_have_inst = has_inst_wb;
+    assign debug_wb_pc        = inst_pc_wb;
     assign debug_wb_ena       = reg_wr_en_wb;
     assign debug_wb_reg       = reg_wr_addr_wb;
     assign debug_wb_value     = reg_wr_data_wb;

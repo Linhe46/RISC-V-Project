@@ -110,6 +110,17 @@ module core(
 
     /* no bypass at mem/wb pipeline regfile */
 
+    // if has inst ?
+    logic                       has_inst_id;
+    logic                       has_inst_ex;
+    logic                       has_inst_mem;
+    logic                       has_inst_wb;
+    // If has inst, what's the PC ?
+    logic[`REG_DATA_WIDTH-1:0]  inst_pc_id;
+    logic[`REG_DATA_WIDTH-1:0]  inst_pc_ex;
+    logic[`REG_DATA_WIDTH-1:0]  inst_pc_mem;
+    logic[`REG_DATA_WIDTH-1:0]  inst_pc_wb;
+
     if_ if_stage(
         .rst(rst),
         .stall(stall),
@@ -131,8 +142,11 @@ module core(
         .inst_if(inst_if),
         // outputs
         .PC_id(pc_id),
-        .inst_id(inst_id)
+        .inst_id(inst_id),
+
+        .has_inst_id(has_inst_id)
     );
+    assign inst_pc_id = pc_id;
 
     id id_stage(
         // inputs
@@ -201,7 +215,12 @@ module core(
         .mask_ex(mask_ex),
         .unsigned_load_ex(unsigned_load_ex),
         .reg_write_ex(reg_write_ex),
-        .mem_to_reg_ex(mem_to_reg_ex)
+        .mem_to_reg_ex(mem_to_reg_ex),
+
+        .has_inst_id(has_inst_id),
+        .inst_pc_id(inst_pc_id),
+        .has_inst_ex(has_inst_ex),
+        .inst_pc_ex(inst_pc_ex)
     );
 
     ex ex_stage(
@@ -240,7 +259,12 @@ module core(
         .mask_mem(mask_mem),
         .unsigned_load_mem(unsigned_load_mem),
         .reg_write_mem(reg_write_mem),
-        .mem_to_reg_mem(mem_to_reg_mem)
+        .mem_to_reg_mem(mem_to_reg_mem),
+
+        .has_inst_ex(has_inst_ex),
+        .inst_pc_ex(inst_pc_ex),
+        .has_inst_mem(has_inst_mem),
+        .inst_pc_mem(inst_pc_mem)
     );
 
     mem mem_stage(
@@ -277,7 +301,12 @@ module core(
         .alu_data_wb(alu_data_wb),
         .rd_addr_wb(rd_addr_wb),
         .reg_write_wb(reg_write_wb),
-        .mem_to_reg_wb(mem_to_reg_wb)
+        .mem_to_reg_wb(mem_to_reg_wb),
+
+        .has_inst_mem(has_inst_mem),
+        .inst_pc_mem(inst_pc_mem),
+        .has_inst_wb(has_inst_wb),
+        .inst_pc_wb(inst_pc_wb)
     );
 
     wb wb_stage(
