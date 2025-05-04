@@ -1,8 +1,8 @@
 // Add your code here, or replace this file.
 `include "defines.sv"
-module myCPU (
-    input  logic         cpu_rst,
-    input  logic         cpu_clk,
+module miniRV_SoC (
+    input  logic         fpga_clk,
+    input  logic         fpga_rst,
 
     // Interface to IROM
     
@@ -16,8 +16,8 @@ module myCPU (
 );
 
     // my cpu design 
-    logic clk = cpu_clk;
-    logic rst = cpu_rst;
+    logic clk = fpga_clk;
+    logic rst = fpga_rst;
     // TODO: regard data memory as non-core module
     // otherwise no output 
 
@@ -370,8 +370,9 @@ module myCPU (
         .inst(inst_imem)
     );
 */
+    logic[`MEM_ADDR_WIDTH-1:0] i_addr = (pc_if >> 2); // IROM is aligned by lower 2 bits
     IROM irom(
-        .a(pc_if),
+        .a(i_addr),
         .spo(inst_imem)
     );
 
