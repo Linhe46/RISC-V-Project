@@ -30,26 +30,63 @@ module mem(
     always_comb begin
         if(rst) begin
             dmem_addr    =   `MEM_ADDR_ZERO;
-            dmem_wr_data =   `REG_DATA_ZERO;
+            //dmem_wr_data =   `REG_DATA_ZERO;
             dmem_wr_en   =   0;
             dmem_rd_en   =   0;
-            dmem_mask    =   `MASK_W;
+            //dmem_mask    =   `MASK_W;
         end
         else begin
             dmem_addr    =   alu_res;
-            dmem_wr_data =   bypass_op2;
+            //dmem_wr_data =   bypass_op2;
             dmem_wr_en   =   mem_write;
             dmem_rd_en   =   mem_read;
-            dmem_mask    =   mask;
+            //dmem_mask    =   mask;
         end
+    end
+    
+    // masked data output for STORE
+    // since IP cores don't have mask input
+    // read-write operation to store in Byte unit in a 32bit memory block
+    always_comb begin
+        case(mask)
+            `MASK_W: begin
+                dmem_wr_data = bypass_op2;
+            end
+            `MASK_H: begin
+                case(dmem_addr[1])
+                    1'b1:
+                        dmem_wr_data = {{bypass_op2[15:8]}, {bypass_op2[7:0]}, {mem_data[15:8]}, {mem_data[7:0]}};
+                    1'b0:
+                        dmem_wr_data = {{mem_data[31:24]}, {mem_data[23:16]}, {bypass_op2[15:8]}, {bypass_op2[7:0]}};
+                    default: begin end
+                endcase
+            end
+            `MASK_B: begin
+                case(dmem_addr[1:0])
+                    2'b00:
+                        dmem_wr_data = {{mem_data[31:24]}, {mem_data[23:16]}, {mem_data[15:8]}, {bypass_op2[7:0]}};
+                    2'b01:
+                        dmem_wr_data = {{mem_data[31:24]}, {mem_data[23:16]}, {bypass_op2[7:0]}, {mem_data[7:0]}};
+                    2'b10:
+                        dmem_wr_data = {{mem_data[31:24]}, {bypass_op2[7:0]}, {mem_data[15:8]}, {mem_data[7:0]}};
+                    2'b11:
+                        dmem_wr_data = {{bypass_op2[7:0]}, {mem_data[23:16]}, {mem_data[15:8]}, {mem_data[7:0]}};
+                    default begin end
+                endcase
+            end
+            default begin end
+        endcase
     end
 
     /* ex stage logic */
     // formulate memory read output
     always_comb begin
-        if(~mem_read)
-            mem_data = `REG_DATA_ZERO;
-        else begin
+        //if(~mem_read)
+            //mem_data = `REG_DATA_ZERO;
+        //else 
+
+        // always read to enable SB, SH
+        begin
             case(mask)
                 `MASK_W: begin
                     mem_data = dmem_rd_data;
