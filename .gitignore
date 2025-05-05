@@ -1,1 +1,7 @@
 .vscode
+obj_dir
+waveform
+mycpu/*
+meminit.bin
+*.txt
+debug.tcl
