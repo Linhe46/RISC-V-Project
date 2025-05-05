@@ -44,6 +44,7 @@ module mem(
         end
     end
     
+    /* Mem write logic */
     // masked data output for STORE
     // since IP cores don't have mask input
     // read-write operation to store in Byte unit in a 32bit memory block
@@ -55,22 +56,22 @@ module mem(
             `MASK_H: begin
                 case(dmem_addr[1])
                     1'b1:
-                        dmem_wr_data = {{bypass_op2[15:8]}, {bypass_op2[7:0]}, {mem_data[15:8]}, {mem_data[7:0]}};
+                        dmem_wr_data = {{bypass_op2[15:8]}, {bypass_op2[7:0]}, {dmem_rd_data[15:8]}, {dmem_rd_data[7:0]}};
                     1'b0:
-                        dmem_wr_data = {{mem_data[31:24]}, {mem_data[23:16]}, {bypass_op2[15:8]}, {bypass_op2[7:0]}};
+                        dmem_wr_data = {{dmem_rd_data[31:24]}, {dmem_rd_data[23:16]}, {bypass_op2[15:8]}, {bypass_op2[7:0]}};
                     default: begin end
                 endcase
             end
             `MASK_B: begin
                 case(dmem_addr[1:0])
                     2'b00:
-                        dmem_wr_data = {{mem_data[31:24]}, {mem_data[23:16]}, {mem_data[15:8]}, {bypass_op2[7:0]}};
+                        dmem_wr_data = {{dmem_rd_data[31:24]}, {dmem_rd_data[23:16]}, {dmem_rd_data[15:8]}, {bypass_op2[7:0]}};
                     2'b01:
-                        dmem_wr_data = {{mem_data[31:24]}, {mem_data[23:16]}, {bypass_op2[7:0]}, {mem_data[7:0]}};
+                        dmem_wr_data = {{dmem_rd_data[31:24]}, {dmem_rd_data[23:16]}, {bypass_op2[7:0]}, {dmem_rd_data[7:0]}};
                     2'b10:
-                        dmem_wr_data = {{mem_data[31:24]}, {bypass_op2[7:0]}, {mem_data[15:8]}, {mem_data[7:0]}};
+                        dmem_wr_data = {{dmem_rd_data[31:24]}, {bypass_op2[7:0]}, {dmem_rd_data[15:8]}, {dmem_rd_data[7:0]}};
                     2'b11:
-                        dmem_wr_data = {{bypass_op2[7:0]}, {mem_data[23:16]}, {mem_data[15:8]}, {mem_data[7:0]}};
+                        dmem_wr_data = {{bypass_op2[7:0]}, {dmem_rd_data[23:16]}, {dmem_rd_data[15:8]}, {dmem_rd_data[7:0]}};
                     default begin end
                 endcase
             end
@@ -78,24 +79,43 @@ module mem(
         endcase
     end
 
-    /* ex stage logic */
-    // formulate memory read output
+    /* Mem read logic */
+    // memory read out considering load mask
+    logic[31:0] masked_dmem_rd_data;
     always_comb begin
-        //if(~mem_read)
-            //mem_data = `REG_DATA_ZERO;
-        //else 
-
-        // always read to enable SB, SH
-        begin
+        if(~mem_read)
+            mem_data = `REG_DATA_ZERO;
+        else begin
+            masked_dmem_rd_data = 32'b0;
             case(mask)
                 `MASK_W: begin
                     mem_data = dmem_rd_data;
                 end
                 `MASK_H: begin
-                    mem_data = {{16{unsigned_load ? 1'b0 : dmem_rd_data[15]}}, dmem_rd_data[15:0]}; 
+                    // mem_data = {{16{unsigned_load ? 1'b0 : dmem_rd_data[15]}}, dmem_rd_data[15:0]}; 
+                    case(dmem_addr[1])
+                        1'b1:
+                            masked_dmem_rd_data[15:0] = dmem_rd_data[31:16];
+                        1'b0:
+                            masked_dmem_rd_data[15:0] = dmem_rd_data[15:0];
+                        default: begin end
+                    endcase
+                    mem_data = {{16{unsigned_load ? 1'b0 : masked_dmem_rd_data[15]}}, masked_dmem_rd_data[15:0]}; 
                 end
                 `MASK_B: begin
-                    mem_data = {{24{unsigned_load ? 1'b0 : dmem_rd_data[7]}}, dmem_rd_data[7:0]}; 
+                    //mem_data = {{24{unsigned_load ? 1'b0 : dmem_rd_data[7]}}, dmem_rd_data[7:0]}; 
+                    case(dmem_addr[1:0])
+                        2'b00:
+                            masked_dmem_rd_data[7:0] = dmem_rd_data[7:0];
+                        2'b01:
+                            masked_dmem_rd_data[7:0] = dmem_rd_data[15:8];
+                        2'b10:
+                            masked_dmem_rd_data[7:0] = dmem_rd_data[23:16];
+                        2'b11:
+                            masked_dmem_rd_data[7:0] = dmem_rd_data[31:24];
+                        default begin end
+                    endcase
+                    mem_data = {{24{unsigned_load ? 1'b0 : masked_dmem_rd_data[7]}}, masked_dmem_rd_data[7:0]}; 
                 end
                 default begin end
             endcase

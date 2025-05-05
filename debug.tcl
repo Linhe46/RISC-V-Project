@@ -32,6 +32,14 @@ set mem_info {
     TOP.miniRV_SoC.dram.d
 }
 
+set inner_info {
+    TOP.miniRV_SoC.my_cpu.mem_stage.mem_data
+    #TOP.miniRV_SoC.my_cpu.id_stage.S_imm
+    TOP.miniRV_SoC.my_cpu.id_stage.sext_S_imm
+    TOP.miniRV_SoC.my_cpu.id_stage.sext_I_imm
+    TOP.miniRV_SoC.my_cpu.mem_stage.dmem_addr
+}
+
 gtkwave::nop
 gtkwave::/Edit/Set_Trace_Max_Hier 0
 gtkwave::/View/Show_Filled_High_Values 1
@@ -54,4 +62,9 @@ gtkwave::/Edit/UnHighlight_All
 gtkwave::addSignalsFromList $mem_info
 gtkwave::highlightSignalsFromList $mem_info
 gtkwave::/Edit/Color_Format/Indigo
+gtkwave::/Edit/UnHighlight_All
+
+gtkwave::addSignalsFromList $inner_info
+gtkwave::highlightSignalsFromList $inner_info
+gtkwave::/Edit/Color_Format/Red
 gtkwave::/Edit/UnHighlight_All
