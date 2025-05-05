@@ -13,12 +13,23 @@ set debug_output {
 }
 
 set inst_info {
-    TOP.miniRV_SoC.pc_if
-    TOP.miniRV_SoC.inst_if
-    TOP.miniRV_SoC.inst_pc_id
-    TOP.miniRV_SoC.inst_id
-    TOP.miniRV_SoC.inst_pc_ex
-    TOP.miniRV_SoC.inst_pc_mem
+    TOP.miniRV_SoC.my_cpu.pc_if
+    TOP.miniRV_SoC.my_cpu.inst_if
+    TOP.miniRV_SoC.my_cpu.inst_pc_id
+    TOP.miniRV_SoC.my_cpu.inst_id
+    TOP.miniRV_SoC.my_cpu.inst_pc_ex
+    TOP.miniRV_SoC.my_cpu.inst_pc_mem
+}
+
+set mem_info {
+    # IROM
+    TOP.miniRV_SoC.irom.a
+    TOP.miniRV_SoC.irom.spo
+    # DRAM
+    TOP.miniRV_SoC.dram.a
+    TOP.miniRV_SoC.dram.spo
+    TOP.miniRV_SoC.dram.we
+    TOP.miniRV_SoC.dram.d
 }
 
 gtkwave::nop
@@ -38,4 +49,9 @@ gtkwave::/Edit/UnHighlight_All
 gtkwave::addSignalsFromList $inst_info
 gtkwave::highlightSignalsFromList $inst_info
 gtkwave::/Edit/Color_Format/Yellow
+gtkwave::/Edit/UnHighlight_All
+
+gtkwave::addSignalsFromList $mem_info
+gtkwave::highlightSignalsFromList $mem_info
+gtkwave::/Edit/Color_Format/Indigo
 gtkwave::/Edit/UnHighlight_All
