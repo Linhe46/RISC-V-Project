@@ -61,6 +61,8 @@ module ex(
                 // Compare
                 `ALU_SLT: begin alu_res = signed_lt(alu_op1, alu_op2) ? `REG_DATA_ONE : `REG_DATA_ZERO; end
                 `ALU_SLTU: begin alu_res = alu_op1 < alu_op2 ? `REG_DATA_ONE : `REG_DATA_ZERO; end 
+                // Bypass (write imm(or next PC) to rd)
+                `ALU_BYPASS: begin alu_res = imm; end
                 default: begin end
             endcase
         end

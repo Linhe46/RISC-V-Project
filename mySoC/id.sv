@@ -233,11 +233,11 @@ module id(
                 end
                 `OP_LUI: begin
                     `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, rd, {U_imm, 12'b0})     // Load upper 20bits
-                    `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)        // perform a '0 + imm' operation for WB and forwarding
+                    `set_control(`ALU_BYPASS, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)        // bypassed
                 end
                 `OP_AUIPC: begin
                     `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, rd, pc + {U_imm, 12'b0} /* adhoc */)
-                    `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)        // perform a '0 + pc_offset' operation for WB and forwarding
+                    `set_control(`ALU_BYPASS, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)        // bypassed
                 end
                 /* branch logic begin */
                 `OP_BRA: begin
@@ -274,14 +274,14 @@ module id(
                 // yet imm is bypassed to MEM and not passed to WB, let it pass ALU
                 `OP_JAL: begin
                     `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, rd, pc_next)
-                    `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)
+                    `set_control(`ALU_BYPASS, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)
                     `set_branch(1, 1, pc_jal)
                 end
                 `OP_JALR: begin
                     case(funct3)
                         `FUNCT3_JALR: begin
-                            `set_regimm(0, 0, `REG_ADDR_ZERO, `REG_ADDR_ZERO, rd, pc_next)
-                            `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)
+                            `set_regimm(1, 0, rs1, `REG_ADDR_ZERO, rd, pc_next)
+                            `set_control(`ALU_BYPASS, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0)
                             `set_branch(1, 1, pc_jalr)
                         end
                         default: begin end

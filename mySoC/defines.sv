@@ -112,6 +112,7 @@
 `define ALU_SRA         4'd8
 `define ALU_OR          4'd9
 `define ALU_AND         4'd10
+`define ALU_BYPASS      4'd11
 /*========================= ALU_OP signal end =============================== */
 
 /*========================= ALU src select begin ============================ */
