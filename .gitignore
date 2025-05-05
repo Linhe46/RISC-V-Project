@@ -3,3 +3,4 @@ waveform
 mycpu/*
 meminit.bin
 *.txt
+debug.tcl
