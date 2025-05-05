@@ -21,3 +21,12 @@ clean:
 	rm -rf obj_dir waveform $(TESTFILE)
 
 .PHONY: run debug clean
+
+# watch wave using tcl
+WAVE = addi
+WAVE_DIR = waveform
+TCL_FILE = debug.tcl
+GTKWAVE = gtkwave
+wave:
+	$(GTKWAVE) -T $(TCL_FILE) $(WAVE_DIR)/$(WAVE).vcd
+
