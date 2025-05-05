@@ -57,19 +57,13 @@ module id(
     logic[4:0] rs1      = inst[19:15];
     logic[4:0] rd       = inst[11:7];
     // immediate generation
-    logic[11:0] I_imm   = inst[31:20];
-    logic[11:0] S_imm   = {inst[31:25], inst[11:7]};
+    logic[31:0] sext_I_imm;
+    assign sext_I_imm       =   {{20{inst[31]}}, {inst[31:20]}};
+    //logic[11:0] S_imm   = {{inst[31:25]}, {inst[11:7]}};
+    logic[31:0] sext_S_imm;
+    assign sext_S_imm       =   {{20{inst[31]}}, {inst[31:25]}, {inst[11:7]}};
     logic[19:0] U_imm   = inst[31:12];
     // B/J fmt are variations of S/U fmt, shift by add a LSB 0
-    //logic[12:0] B_imm    = {inst[31], inst[7], inst[30:25], inst[11:8], 1'b0};         // bug in sim: always zero
-    //logic[20:0] J_imm    = {inst[31], inst[19:12], inst[20], inst[30:21], 1'b0};        // bug in sim: always zero
-    /*
-    logic[11:0] B_imm_new     = {inst[31], inst[7], inst[30:25], inst[11:8]}; 
-    logic[19:0] J_imm_new    = {inst[31], inst[19:12], inst[20], inst[30:21]};
-    logic[12:0] B_imm        =     B_imm_new << 1;
-    //logic[20:0] J_imm        =     J_imm_new << 1;            // also bug ??
-    //logic[20:0]    J_imm        = {J_imm_new, 1'b0};    // also bug ???
-    */
     logic[31:0] sext_shift_B_imm;
     assign sext_shift_B_imm     =   {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0}; 
     logic[31:0] sext_shift_J_imm;
@@ -109,7 +103,8 @@ module id(
     assign pc_bra = pc + sext_shift_B_imm;
     logic[31:0] pc_jal  = pc + sext_shift_J_imm;
     //logic[31:0] pc_jalr = rs1_data_reg + {{20{I_imm[11]}}, I_imm} & ~(32'd1);   // set the LSB to 0
-    logic[31:0] pc_jalr = bra_op1 + {{20{I_imm[11]}}, I_imm} & ~(32'd1);   // set the LSB to 0
+    //logic[31:0] pc_jalr = bra_op1 + {{20{I_imm[11]}}, I_imm} & ~(32'd1);   // set the LSB to 0
+    logic[31:0] pc_jalr = bra_op1 + sext_I_imm & ~(32'd1);   // set the LSB to 0
 
     // assignment macro
     `define set_regimm(rs1_rd_en_, rs2_rd_en_, rs1_addr_, rs2_addr_, rd_addr_, imm_)     \
@@ -202,7 +197,7 @@ module id(
                     endcase
                 end
                 `OP_ALUI: begin
-                    `set_regimm(1, 0, rs1, rs2, rd, {{20{I_imm[11]}}, I_imm})
+                    `set_regimm(1, 0, rs1, rs2, rd, sext_I_imm)
                     case(funct3)        
                         `FUNCT3_ADDI:     begin `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0) end
                         `FUNCT3_SLTI:     begin `set_control(`ALU_SLT, `ALU_SRC_IMM, 0, 0, `MASK_W, 0, 1, 0) end
@@ -294,7 +289,7 @@ module id(
                 end
                 /* branch logic end */
                 `OP_LOAD: begin
-                    `set_regimm(1, 0, rs1, `REG_ADDR_ZERO, rd, {{20{I_imm[11]}}, I_imm})
+                    `set_regimm(1, 0, rs1, `REG_ADDR_ZERO, rd, sext_I_imm)
                     case(funct3)
                         `FUNCT3_LB: begin `set_control(`ALU_ADD, `ALU_SRC_IMM, 1, 0, `MASK_B, 0, 1, 1) end
                         `FUNCT3_LH: begin `set_control(`ALU_ADD, `ALU_SRC_IMM, 1, 0, `MASK_H, 0, 1, 1) end
@@ -305,7 +300,8 @@ module id(
                     endcase
                 end
                 `OP_STORE: begin
-                    `set_regimm(1, 1, rs1, rs2, `REG_ADDR_ZERO, {{20{I_imm[11]}}, I_imm})
+                    //`set_regimm(1, 1, rs1, rs2, `REG_ADDR_ZERO, {{20{S_imm[11]}}, S_imm})
+                    `set_regimm(1, 1, rs1, rs2, `REG_ADDR_ZERO, sext_S_imm)
                     case(funct3)
                         `FUNCT3_SB: begin `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 1, `MASK_B, 0, 0, 0) end
                         `FUNCT3_SH: begin `set_control(`ALU_ADD, `ALU_SRC_IMM, 0, 1, `MASK_H, 0, 0, 0) end
