@@ -82,14 +82,15 @@ module id(
 
     logic rs1_eq_rs2    =     bra_op1 == bra_op2;
     logic rs1_ne_rs2    =     bra_op1 != bra_op2;
-    function signed_lt;
+    function logic signed_lt;
         input [31:0] rs1, rs2;
-        logic res;
-        if(rs1[31] != rs2[31]) res = rs1[31];
-        else res = rs1 < rs2;
+        if(rs1[31] != rs2[31]) signed_lt = rs1[31];
+        else signed_lt = rs1 < rs2;
     endfunction
-    logic rs1_lt_rs2    =   signed_lt(bra_op1, bra_op2); 
-    logic rs1_ge_rs2    =  ~signed_lt(bra_op1, bra_op2);
+    logic rs1_lt_rs2;
+    logic rs1_ge_rs2;
+    assign rs1_lt_rs2   =   signed_lt(bra_op1, bra_op2);
+    assign rs1_ge_rs2    =  ~rs1_lt_rs2;
     logic rs1_ltu_rs2   =   bra_op1 < bra_op2;
     logic rs1_geu_rs2   =  ~(bra_op1 < bra_op2);
 
