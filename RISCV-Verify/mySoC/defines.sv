@@ -13,6 +13,7 @@
 `define STALL_LOAD      5'd3    // stall ID stage and IF stage
 
 /* Some frequently used signals */
+`define PC_ZERO             32'h0000_0000 // used on board
 `define REG_DATA_ZERO       32'b0
 `define REG_DATA_ONE        32'd1   // used in COMPARE
 `define REG_DATA_WIDTH      32      // R32I

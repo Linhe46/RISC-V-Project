@@ -19,7 +19,7 @@ module PC(
     logic[31:0] PC_next;
     always_ff @(posedge clk) begin
         if(rst)
-            PC_out <= 32'b0;
+            PC_out <= `PC_ZERO;
         //else if(stall == `STALL_LOAD)   // re-fetch the instruction
         else if(~wr_en)
             PC_out <= PC_out;
