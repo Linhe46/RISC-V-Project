@@ -33,14 +33,14 @@ module mem #(parameter SUPPORT_MASK = 1)(
             //dmem_wr_data =   `REG_DATA_ZERO;
             dmem_wr_en   =   0;
             dmem_rd_en   =   0;
-            //dmem_mask    =   `MASK_W;
+            dmem_mask    =   `MASK_W;
         end
         else begin
             dmem_addr    =   alu_res;
             //dmem_wr_data =   bypass_op2;
             dmem_wr_en   =   mem_write;
             dmem_rd_en   =   mem_read;
-            //dmem_mask    =   mask;
+            dmem_mask    =   mask;
         end
     end
     

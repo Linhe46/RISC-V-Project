@@ -15,7 +15,7 @@ module if_(
 
     always_comb begin
         if(rst) begin
-            pc_out  =   0;
+            pc_out  =   `PC_ZERO;
             inst    =   0;
         end
         else begin
