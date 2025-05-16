@@ -63,7 +63,7 @@ module ex(
                 `ALU_SLTU: begin alu_res = alu_op1 < alu_op2 ? `REG_DATA_ONE : `REG_DATA_ZERO; end 
                 // Bypass (write imm(or next PC) to rd)
                 `ALU_BYPASS: begin alu_res = imm; end
-                default: begin end
+                default: begin alu_res = `REG_DATA_ZERO; end
             endcase
         end
     end

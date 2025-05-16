@@ -32,9 +32,8 @@ module ex(
     // used in compare
     function signed_lt;
         input [31:0] rs1, rs2;
-        logic res;
-        if(rs1[31] != rs2[31]) res = rs1[31];
-        else res = rs1 < rs2;
+        if(rs1[31] != rs2[31]) signed_lt = rs1[31];
+        else signed_lt = rs1 < rs2;
     endfunction
 
     always_comb begin
@@ -62,7 +61,9 @@ module ex(
                 // Compare
                 `ALU_SLT: begin alu_res = signed_lt(alu_op1, alu_op2) ? `REG_DATA_ONE : `REG_DATA_ZERO; end
                 `ALU_SLTU: begin alu_res = alu_op1 < alu_op2 ? `REG_DATA_ONE : `REG_DATA_ZERO; end 
-                default: begin alu_res  = 0; end
+                // Bypass (write imm(or next PC) to rd)
+                `ALU_BYPASS: begin alu_res = imm; end
+                default: begin alu_res = `REG_DATA_ZERO; end
             endcase
         end
     end

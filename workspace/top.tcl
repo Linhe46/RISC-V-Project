@@ -4,12 +4,12 @@ set global_input {
     TOP.rst
 }
 
-set PC_U TOP.core.pc_u
+set PC_U TOP.top.core_u.pc_u
 set pc_output "
     $PC_U.PC_next
 "
 
-set IF TOP.core.if_stage
+set IF TOP.top.core_u.if_stage
 set if_signal "
     $IF.stall
     $IF.pc_wr_en
@@ -17,7 +17,7 @@ set if_signal "
     $IF.inst
 "
 
-set ID TOP.core.id_stage
+set ID TOP.top.core_u.id_stage
 set id_signal "
     $ID.pc
     $ID.inst
@@ -56,6 +56,23 @@ set id_signal "
     $ID.rs1_geu_rs2
 "
 
+set EX TOP.top.core_u.ex_stage
+set ex_signals "
+    $EX.rs1_data
+    $EX.rs2_data
+    $EX.imm
+    $EX.forward_op1
+    $EX.forward_op2
+    $EX.forward_data_mem
+    $EX.forward_data_wb
+    $EX.alu_op
+    $EX.alu_src
+    # outputs
+    $EX.alu_res
+    $EX.bypass_op2
+    # outputs
+"
+
 set STALL TOP.core.stall_u
 set stall_signal "
     $STALL.stall
@@ -91,4 +108,10 @@ gtkwave::/Edit/UnHighlight_All
 gtkwave::addSignalsFromList $id_signal
 gtkwave::highlightSignalsFromList $id_signal
 gtkwave::/Edit/Color_Format/Blue
+gtkwave::/Edit/UnHighlight_All
+
+# view ex signal
+gtkwave::addSignalsFromList $ex_signals
+gtkwave::highlightSignalsFromList $ex_signals
+gtkwave::/Edit/Color_Format/Violet
 gtkwave::/Edit/UnHighlight_All

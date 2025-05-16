@@ -38,6 +38,7 @@ module registers(
         
     /* read logic */
     always_comb begin
+        rd2_data = 32'b0;
         if(rd2_addr == `REG_ADDR_ZERO)
             rd2_data = 0;
         else if(rd2_addr == wr_addr && wr_en)
@@ -46,6 +47,7 @@ module registers(
             rd2_data = rs2_rd_en ? regfile[rd2_addr] : `REG_DATA_ZERO;
     end
     always_comb begin
+        rd1_data = 32'b0;
         if(rd1_addr == `REG_ADDR_ZERO)
             rd1_data = 0;
         else if(rd1_addr == wr_addr && wr_en)

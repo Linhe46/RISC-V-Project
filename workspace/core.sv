@@ -2,9 +2,19 @@
 `include "defines.sv"
 module core(
     input   logic   clk,
-    input   logic   rst
-    // TODO: regard data memory as non-core module
-    // otherwise no output 
+    input   logic   rst,
+
+    // Instruction memory interface
+    input   logic[`REG_DATA_WIDTH-1:0]  irom_data,
+    output  logic[`MEM_ADDR_WIDTH-1:0]  irom_addr,
+    output  logic                       irom_rd_en,
+    // Data memory interface
+    input   logic[`REG_DATA_WIDTH-1:0]  dram_rd_data,
+    output  logic[`MEM_ADDR_WIDTH-1:0]  dram_addr,
+    output  logic[`REG_DATA_WIDTH-1:0]  dram_wr_data,
+    output  logic                       dram_wr_en,
+    output  logic                       dram_rd_en,
+    output  logic[`MASK_WIDTH-1:0]      dram_mask
 );
     // stall signals
     logic[`STALL_WIDTH-1:0] stall;
@@ -318,25 +328,6 @@ module core(
         .rd2_data(rs2_data_reg)
     );
 
-    inst_memory imem(
-        .rd_en(imem_rd_en),
-        .addr(pc_if),
-        // outputs
-        .inst(inst_imem)
-    );
-
-    data_memory dmem(
-        .clk(clk),
-        .rst(rst),
-        .rd_en(dmem_rd_en),
-        .wr_en(dmem_wr_en),
-        .mask(dmem_mask),
-        .addr(dmem_addr),
-        .wr_data(dmem_wr_data),
-        // output
-        .rd_data(dmem_rd_data)
-    );
-
     forward_unit_ex forward_ex_u(
         .rst(rst),
         .rs1_rd_en_ex(rs1_rd_en_ex),
@@ -384,5 +375,18 @@ module core(
         // outputs
         .stall(stall)
     );
+
+    // IROM Interface
+    assign inst_imem = irom_data;
+    assign irom_addr = pc_if;
+    assign irom_rd_en = imem_rd_en;
+
+    // DRAM Interface
+    assign dmem_rd_data = dram_rd_data;
+    assign dram_addr = dmem_addr;
+    assign dram_wr_data = dmem_wr_data;
+    assign dram_wr_en = dmem_wr_en;
+    assign dram_rd_en = dmem_rd_en;
+    assign dram_mask = dmem_mask;
 
 endmodule

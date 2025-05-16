@@ -4,7 +4,6 @@
 // - Decode the instruction and generate imm, control signals, etc.
 // - Perform branch operation
 // - Get rs1/rs2 values from registers
-// TODO: hazzard detect and send stall signals
 
 /* verilator lint_off WIDTHEXPAND */
 `include "defines.sv"
