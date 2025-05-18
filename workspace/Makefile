@@ -1,5 +1,5 @@
 # Verilog src dir
-SRC_DIR = .
+SRC_DIR = ./vsrcs
 
 # Sim wrapper src dir
 SIM_DIR = ./sim_wrappers
@@ -12,7 +12,8 @@ V_SRCS_MEM = mem.sv data_memory.sv mem_wb_reg.sv
 V_SRCS_WB = wb.sv
 V_SRCS_CTRL = stall_unit.sv forward_unit.sv
 V_SRCS_CORE = core.sv $(V_SRCS_IF) $(V_SRCS_ID) $(V_SRCS_EX) $(V_SRCS_MEM) $(V_SRCS_WB) $(V_SRCS_CTRL)
-V_SRCS_TOP = top.sv $(V_SRCS_CORE)
+V_SRCS_TOP_ORIG = top.sv $(V_SRCS_CORE)
+V_SRCS_TOP = $(addprefix $(SRC_DIR)/, $(V_SRCS_TOP_ORIG))
 
 # Simulation src files
 SIM_SRCS_TOP = $(SIM_DIR)/sim_main_top.cpp
@@ -40,9 +41,9 @@ WAVE = $(WAVE_TOP)
 VERILATOR = verilator
 
 # Compiling Options
-VERILATOR_FLAGS = -cc --exe --build --trace -I/.
+VERILATOR_FLAGS = -cc --exe --build --trace -I/. -I./vsrcs
 
-IMEM_GEN_ENABLE ?= true
+IMEM_GEN_ENABLE ?= false
 DATA_GEN_ENABLE ?= false
 
 top: $(V_SRCS_TOP) $(SIM_SRCS_TOP) $(MEM_TXT)

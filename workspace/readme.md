@@ -7,7 +7,6 @@ Input cpp-style simulation testbench, used in Verilator verification.
 ## Verilog srcs
 ### defines.sv
 Define some macros for reuse in verilog files, like **decode bits**, **signal width**, **stall types**, etc.  
-Add as needed.
 
 ### if.sv
 The Program counter(PC) used for fetching instructions and update PC.

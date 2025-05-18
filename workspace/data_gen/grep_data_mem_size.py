@@ -1,7 +1,8 @@
 import re
 
+DEFINE_FILE = '../vsrcs/defines.sv'
 # 打开 SystemVerilog 文件
-with open("../defines.sv", "r") as file:
+with open(DEFINE_FILE, "r") as file:
     content = file.read()
 
 # 提取宏定义

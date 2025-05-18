@@ -4,3 +4,4 @@ obj_dir/
 test*
 wave_dir
 *.txt
+*results/

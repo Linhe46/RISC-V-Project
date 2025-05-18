@@ -9,8 +9,8 @@ module registers(
     input logic      clk,
     input logic      rst,
     input logic      wr_en,
-    input logic      rs1_rd_en,
-    input logic      rs2_rd_en,
+    input logic      rs1_rd_en,     // remove
+    input logic      rs2_rd_en,     // remove
     input logic[4:0] rd1_addr,
     input logic[4:0] rd2_addr,
     input logic[4:0] wr_addr,
