@@ -7,10 +7,11 @@ The project is targeted at The 9th China College IC Competition-The JYD Trophy's
 Out team ID is CICC0901516.
 
 ## Overview
-The block digram of our CPU design is as below: 
+The block diagram of our CPU design is as below: 
 
-----TBD----
+![Block Diagram](RTL/block_diagram.png)
 
+With these features:
 - 5-stage(IF-ID-EX-MEM-WB) pipelined deisgn
 - Handle data hazzard, structural hazzard, control hazzard problems properly using data forwarding and stall
 - Synchronous reset
@@ -141,15 +142,20 @@ Use contest template project in```JYD2025_Contest-Template``` provided by the co
 
 **1.Open the project**  
 Run vivado 2023.2 -> click 'Open project' -> choose ```digital_twin.xpr``` in the template project directory  
+
 **2.Add design srcs to template**  
 Click 'Project Manager-Add sources-Add or create design sources' and select all .sv files in ```RISCV-Verify/srcs/design_srcs```.  
 
 (Optional) Modify the config of IP cores as needed, e.g. PLL, IROM, DRAM.  
+
 **3.Synthesis & Implementation**   
 Click 'run synthesis' and wait until finished.  
 Click 'run implementation' and wait until finished.  
+
 **4.Generate bitstream**  
 Click 'generate bitstream implementation' and wait until finished.  
+
 **5.Open Hardware Manager and connect to the FPGA board (remotely)**  
 We connect the FPGA board remotely and use the *digital_twin* platform provided by the contest.  
+
 **6.Program Device and Watch the result**
