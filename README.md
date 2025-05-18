@@ -17,7 +17,7 @@ The block digram of our CPU design is as below:
 - Support RV32I subset(except ```ecall, ebreak, fence```)
 - Predict untaken branching strategy
 ## Platform
-Simulation: WSL2 Linux Ubuntu 22.04 LTS  
+Design & Simulation: WSL2 Linux Ubuntu 22.04 LTS  
 Verification on FPGA: Windows11, FPGA board with Kintex-7 xc7k325tffg900-2 chip
 ## Dependencies
 [Verilator 5.032](https://github.com/verilator/verilator)  
@@ -31,10 +31,13 @@ The project's structrue is as below:
 ```
 .
 ├── README.md
+├── RTL/
 ├── RISCV-Trace/
 ├── RISCV-Verify/
 └── workspace/
 ```
+- Design Source Code
+    - RTL: include common srcs and unique srcs used in simulation & verification.
 - Simulation
     - workspace: Include all design srcs and **self-defined testcases**.  
     - RISCV-Trace: Include **cdp-tests testcases** and modified srcs for ```miniRV_SoC.sv```.
@@ -42,7 +45,7 @@ The project's structrue is as below:
     - RISCV-Verify: Include **on-board vivado project** and **testcase provided by preliminary contest**(```dram.coe, irom.coe```).
 
 ## Design Source Code
-TBD
+See ```readme``` in ```RTL/``` for details.
 
 ## Simulation & Tests
 ### 1.RISCV-Trace (cdp-tests)
