@@ -34,7 +34,8 @@ GTKWAVE = gtkwave
 TOP_TCL = top.tcl
 
 # Wave file
-WAVE_TOP = wave_dir/top.vcd
+WAVE_DIR = wave_dir
+WAVE_TOP = $(WAVE_DIR)/top.vcd
 WAVE = $(WAVE_TOP)
 
 # Verilator Compiler
@@ -44,7 +45,7 @@ VERILATOR = verilator
 VERILATOR_FLAGS = -cc --exe --build --trace -I/. -I./vsrcs
 
 IMEM_GEN_ENABLE ?= false
-DATA_GEN_ENABLE ?= false
+DMEM_GEN_ENABLE ?= false
 
 top: $(V_SRCS_TOP) $(SIM_SRCS_TOP) $(MEM_TXT)
 ifeq ($(IMEM_GEN_ENABLE), true)
@@ -53,12 +54,13 @@ ifeq ($(IMEM_GEN_ENABLE), true)
 else
 	@echo "\033[1;32mIMEM_GEN_ENABLE is false, run instructions in the inst_mem..\033[0m"
 endif
-ifeq ($(DATA_GEN_ENABLE), true)
+ifeq ($(DMEM_GEN_ENABLE), true)
 	$(MAKE) dmem_gen --no-print-directory -C ./data_gen -f Makefile
 	@echo "\033[1;32mDMEM_GEN_ENABLE is true, write new data to data_mem and run..\033[0m"
 else
 	@echo "\033[1;32mDMEM_GEN_ENABLE is false, use data in the data_mem..\033[0m"
 endif
+	mkdir -p $(WAVE_DIR)
 	$(VERILATOR) $(VERILATOR_FLAGS) $(V_SRCS_TOP) $(SIM_SRCS_TOP)
 	@$(EXE_TOP)
 

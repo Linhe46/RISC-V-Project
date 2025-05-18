@@ -2,13 +2,23 @@
 ## Brief Intro.
 This Project is a 5-stage pipelined RV32I CPU implemented in SystemVerilog HDL.
 
-The project is targeted at The 9th China College IC Competition-The JYD Trophy(第九届集创赛-竞业达杯)'s preliminary contest.
+The project is targeted at The 9th China College IC Competition-The JYD Trophy's preliminary contest(第九届集创赛-竞业达杯初赛).
 
 Out team ID is CICC0901516.
 
 ## Overview
+The block digram of our CPU design is as below: 
+
+----TBD----
+
+- 5-stage(IF-ID-EX-MEM-WB) pipelined deisgn
+- Handle data hazzard, structural hazzard, control hazzard problems properly using data forwarding and stall
+- Synchronous reset
+- Support RV32I subset(except ```ecall, ebreak, fence```)
+- Predict untaken branching strategy
 ## Platform
-WSL2 Linux Ubuntu 22.04 LTS
+Simulation: WSL2 Linux Ubuntu 22.04 LTS  
+Verification on FPGA: Windows11, FPGA board with Kintex-7 xc7k325tffg900-2 chip
 ## Dependencies
 [Verilator 5.032](https://github.com/verilator/verilator)  
 [GTKWave Analyzer v3.3.104](https://gtkwave.sourceforge.net/)  
@@ -25,12 +35,17 @@ The project's structrue is as below:
 ├── RISCV-Verify/
 └── workspace/
 ```
-- workspace: Include all design srcs and **self-defined testcases**.  
-- RISCV-Trace: Include **cdp-tests testcases** and modified srcs for ```miniRV_SoC.sv```.
-- RISCV-Verify: Include **on-board vivado project** and **testcase provided by preliminary contest**(test.asm).
+- Simulation
+    - workspace: Include all design srcs and **self-defined testcases**.  
+    - RISCV-Trace: Include **cdp-tests testcases** and modified srcs for ```miniRV_SoC.sv```.
+- Verification(on FPGA board)
+    - RISCV-Verify: Include **on-board vivado project** and **testcase provided by preliminary contest**(```dram.coe, irom.coe```).
 
-## Simulation
-### RISCV-Trace
+## Design Source Code
+TBD
+
+## Simulation & Tests
+### 1.RISCV-Trace (cdp-tests)
 #### Structure
 ```
 ./
@@ -41,36 +56,34 @@ The project's structrue is as below:
 ├── golden_model/
 ├── meminit.bin -> bin/add.bin
 ├── mySoC/          # all design srcs are added here
-├── obj_dir/
 ├── run_all_tests.py
 ├── start.dump
-├── vsrc/
-└── waveform/
+└── vsrc/
 ```
 Except modification for ```mySoC/``` to implement our CPU deisgn, other content is the same as [cdp-tests](https://gitee.com/hitsz-cslab/cdp-tests).
 #### Usage
-1.Enter the directory
+**1.Enter the directory**
 ```bash
 cd RISCV-Trace
 ```
-2.Test Single case  
+**2.Test single case**  
 You can run single test choosing from **{add, addi, and, andi, ...}**. See testcase names in ```bin/``` for details.  
 For example, the below command will test ```add.bin```:
 ```bash
 make run TEST=add
 ```
 
-3.Test all cases
+**3.Test all cases**  
 Run the commands below to start all 39 testcases simulation.
 ```bash
 make build    # make sure build once before run all tests
-python3 run_all_tests
+python3 run_all_tests.py
 ```
 
 (Optional) After running any case, watch wave using gtkwave, e.g. ```gtkwave waveform/add.vcd```
 
 
-### workspace
+### 2.workspace (self-defined tests)
 #### Structure
 ```
 ./
@@ -85,12 +98,12 @@ python3 run_all_tests
 ```
 
 #### Usage
-1.Enter the directory  
+**1.Enter the directory**  
 ```bash
 cd workspace
 ```
 
-2.Create dump files
+**2.Create memory dump files**
 ```bash
 touch inst_memory.txt
 touch data_memory.txt
@@ -100,7 +113,7 @@ touch data_memory.txt
 
 (Optinal) Add self-defined data stored in DMEM as needed(see ```data_gen/data_memory_gen.cpp```), you may need modify the memory config in ```vsrcs/defines.sv``` for data size larger than default(32x32bit)
 
-3.Generate inst_memory/data_memory data and Run CPU simulation.  
+**3.Generate inst_memory/data_memory data and Run CPU simulation**  
 The make options set 'true' will write insts in ```data_gen_inst_memory.cpp``` and data in ```data_gen_data_memory.cpp``` into dump files before simulation.
 ```bash
 make top IMEM_GEN_ENABLE=true DMEM_GEN_ENABLE=true
@@ -112,9 +125,28 @@ make top
 ```
 to start CPU simulation only.
 
-4.If no error occurs, you can watch waveform by
+**4.Watch simulation results**  
+If no error occurs, you can watch waveform by
 ```bash
 make wave
 ```
 This will open simulation wave using gtkwave and display waves set by ```top.tcl```.  
 (Optional) Modify ```top.tcl``` to watch waves as needed.
+
+## Verification on FPGA
+Use contest template project in```JYD2025_Contest-Template``` provided by the contest, which contains **RV32I tests** and a **Performance test**.  
+
+**1.Open the project**  
+Run vivado 2023.2 -> click 'Open project' -> choose ```digital_twin.xpr``` in the template project directory  
+**2.Add design srcs to template**  
+Click 'Project Manager-Add sources-Add or create design sources' and select all .sv files in ```RISCV-Verify/srcs/design_srcs```.  
+
+(Optional) Modify the config of IP cores as needed, e.g. PLL, IROM, DRAM.  
+**3.Synthesis & Implementation**   
+Click 'run synthesis' and wait until finished.  
+Click 'run implementation' and wait until finished.  
+**4.Generate bitstream**  
+Click 'generate bitstream implementation' and wait until finished.  
+**5.Open Hardware Manager and connect to the FPGA board (remotely)**  
+We connect the FPGA board remotely and use the *digital_twin* platform provided by the contest.  
+**6.Program Device and Watch the result**
