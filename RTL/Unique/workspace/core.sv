@@ -1,27 +1,21 @@
-// Add your code here, or replace this file.
+
 `include "defines.sv"
-module myCPU_debug (
-    input  logic         clk,
-    input  logic         rst,
+module core(
+    input   logic   clk,
+    input   logic   rst,
 
-    // Interface to IROM
-    input  logic[`REG_DATA_WIDTH-1:0]   irom_data,
-    output logic[`MEM_ADDR_WIDTH-1:0]   irom_addr,
-    
-    // Interface to DRAM
-    input  logic[`REG_DATA_WIDTH-1:0]   dram_rd_data,
-    output logic[`MEM_ADDR_WIDTH-1:0]   dram_addr,
-    output logic[`REG_DATA_WIDTH-1:0]   dram_wr_data,
-    output logic                        dram_wr_ena,
-
-    // Interface for Debugging
-    output wire        debug_wb_have_inst,   // WB阶段是否有指令 (对单周期CPU，可在复位后恒为1)
-    output wire [31:0] debug_wb_pc,          // WB阶段的PC (若wb_have_inst=0，此项可为任意值)
-    output wire        debug_wb_ena,         // WB阶段的寄存器写使能 (若wb_have_inst=0，此项可为任意值)
-    output wire [ 4:0] debug_wb_reg,         // WB阶段写入的寄存器号 (若wb_ena或wb_have_inst=0，此项可为任意值)
-    output wire [31:0] debug_wb_value        // WB阶段写入寄存器的值 (若wb_ena或wb_have_inst=0，此项可为任意值)
+    // Instruction memory interface
+    input   logic[`REG_DATA_WIDTH-1:0]  irom_data,
+    output  logic[`MEM_ADDR_WIDTH-1:0]  irom_addr,
+    output  logic                       irom_rd_en,
+    // Data memory interface
+    input   logic[`REG_DATA_WIDTH-1:0]  dram_rd_data,
+    output  logic[`MEM_ADDR_WIDTH-1:0]  dram_addr,
+    output  logic[`REG_DATA_WIDTH-1:0]  dram_wr_data,
+    output  logic                       dram_wr_en,
+    output  logic                       dram_rd_en,
+    output  logic[`MASK_WIDTH-1:0]      dram_mask
 );
-
     // stall signals
     logic[`STALL_WIDTH-1:0] stall;
 
@@ -125,16 +119,6 @@ module myCPU_debug (
     // reg file signals begin
 
     /* no bypass at mem/wb pipeline regfile */
-    // if has inst ?
-    logic                       has_inst_id;
-    logic                       has_inst_ex;
-    logic                       has_inst_mem;
-    logic                       has_inst_wb;
-    // If has inst, what's the PC ?
-    logic[`REG_DATA_WIDTH-1:0]  inst_pc_id;
-    logic[`REG_DATA_WIDTH-1:0]  inst_pc_ex;
-    logic[`REG_DATA_WIDTH-1:0]  inst_pc_mem;
-    logic[`REG_DATA_WIDTH-1:0]  inst_pc_wb;
 
     if_ if_stage(
         .rst(rst),
@@ -157,11 +141,8 @@ module myCPU_debug (
         .inst_if(inst_if),
         // outputs
         .PC_id(pc_id),
-        .inst_id(inst_id),
-
-        .has_inst_id(has_inst_id)
+        .inst_id(inst_id)
     );
-    assign inst_pc_id = pc_id;
 
     id id_stage(
         // inputs
@@ -230,12 +211,7 @@ module myCPU_debug (
         .mask_ex(mask_ex),
         .unsigned_load_ex(unsigned_load_ex),
         .reg_write_ex(reg_write_ex),
-        .mem_to_reg_ex(mem_to_reg_ex),
-
-        .has_inst_id(has_inst_id),
-        .inst_pc_id(inst_pc_id),
-        .has_inst_ex(has_inst_ex),
-        .inst_pc_ex(inst_pc_ex)
+        .mem_to_reg_ex(mem_to_reg_ex)
     );
 
     ex ex_stage(
@@ -274,12 +250,7 @@ module myCPU_debug (
         .mask_mem(mask_mem),
         .unsigned_load_mem(unsigned_load_mem),
         .reg_write_mem(reg_write_mem),
-        .mem_to_reg_mem(mem_to_reg_mem),
-
-        .has_inst_ex(has_inst_ex),
-        .inst_pc_ex(inst_pc_ex),
-        .has_inst_mem(has_inst_mem),
-        .inst_pc_mem(inst_pc_mem)
+        .mem_to_reg_mem(mem_to_reg_mem)
     );
 
     mem mem_stage(
@@ -316,12 +287,7 @@ module myCPU_debug (
         .alu_data_wb(alu_data_wb),
         .rd_addr_wb(rd_addr_wb),
         .reg_write_wb(reg_write_wb),
-        .mem_to_reg_wb(mem_to_reg_wb),
-
-        .has_inst_mem(has_inst_mem),
-        .inst_pc_mem(inst_pc_mem),
-        .has_inst_wb(has_inst_wb),
-        .inst_pc_wb(inst_pc_wb)
+        .mem_to_reg_wb(mem_to_reg_wb)
     );
 
     wb wb_stage(
@@ -361,30 +327,6 @@ module myCPU_debug (
         .rd1_data(rs1_data_reg),
         .rd2_data(rs2_data_reg)
     );
-
-// --------- Using provided IP cores to replace handcraft mems ----------
-/*
-    inst_memory imem(
-        .rd_en(imem_rd_en),
-        .addr(pc_if),
-        // outputs
-        .inst(inst_imem)
-    );
-*/
-
-/*
-    data_memory dmem(
-        .clk(clk),
-        .rst(rst),
-        .rd_en(dmem_rd_en),
-        .wr_en(dmem_wr_en),
-        .mask(dmem_mask),
-        .addr(dmem_addr),
-        .wr_data(dmem_wr_data),
-        // output
-        .rd_data(dmem_rd_data)
-    );
-*/
 
     forward_unit_ex forward_ex_u(
         .rst(rst),
@@ -437,18 +379,14 @@ module myCPU_debug (
     // IROM Interface
     assign inst_imem = irom_data;
     assign irom_addr = pc_if;
+    assign irom_rd_en = imem_rd_en;
 
     // DRAM Interface
     assign dmem_rd_data = dram_rd_data;
     assign dram_addr = dmem_addr;
     assign dram_wr_data = dmem_wr_data;
-    assign dram_wr_ena = dmem_wr_en;
-    
-    // Debug Interface
-    assign debug_wb_have_inst = has_inst_wb;
-    assign debug_wb_pc        = inst_pc_wb;
-    assign debug_wb_ena       = reg_wr_en_wb;
-    assign debug_wb_reg       = reg_wr_addr_wb;
-    assign debug_wb_value     = reg_wr_data_wb;
+    assign dram_wr_en = dmem_wr_en;
+    assign dram_rd_en = dmem_rd_en;
+    assign dram_mask = dmem_mask;
 
 endmodule

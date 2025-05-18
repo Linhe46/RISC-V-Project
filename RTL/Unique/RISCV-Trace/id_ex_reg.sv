@@ -34,6 +34,15 @@ module id_ex_reg(
     input   logic       reg_write_id,
     input   logic       mem_to_reg_id,
 
+    // if has inst ?
+    input       logic                       has_inst_id,
+    // if has inst, what's the pc ?
+    input       logic[`REG_DATA_WIDTH-1:0]  inst_pc_id,
+    // if has inst ?
+    output      logic                       has_inst_ex,
+    // if has inst, what's the pc ?
+    output      logic[`REG_DATA_WIDTH-1:0]  inst_pc_ex,
+
     output   logic[`REG_DATA_WIDTH-1:0]  rs1_data,
     output   logic[`REG_DATA_WIDTH-1:0]  rs2_data,
     output   logic[`REG_DATA_WIDTH-1:0]  imm_ex,
@@ -76,6 +85,9 @@ module id_ex_reg(
             unsigned_load_ex<=  1'b0;
             reg_write_ex    <=  1'b0;
             mem_to_reg_ex   <=  1'b0;
+
+            has_inst_ex     <=      0;
+            inst_pc_ex      <=      `REG_DATA_ZERO;
         end
         else begin
             rs1_data        <=  rs1_data_reg;
@@ -94,6 +106,9 @@ module id_ex_reg(
             unsigned_load_ex<=  unsigned_load_id;
             reg_write_ex    <=  reg_write_id;
             mem_to_reg_ex   <=  mem_to_reg_id;
+
+            has_inst_ex     <=      has_inst_id;
+            inst_pc_ex      <=      inst_pc_id;
         end
     end
 

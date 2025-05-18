@@ -24,7 +24,7 @@ module miniRV_SoC (
 
     logic cpu_clk = fpga_clk;
     logic cpu_rst = fpga_rst; 
-    myCPU_debug my_cpu(
+    myCPU my_cpu(
         .clk(cpu_clk),
         .rst(cpu_rst),
         .irom_data(irom_data),

@@ -1,5 +1,16 @@
-# Design Source Code
+# RV32I CPU Design Source Codes
+All RTL level design source codes are placed here separately.
 
+```
+./
+├── Common/
+├── Unique/
+└── readme.md
+```
+The ```Common``` dir stores basic modules for our pipelined CPU core(5 stages, pipelined regs, pc, register file, forwarding unit, stall unit).  
+The ```Unique``` dir stores unique design codes for implementation of simulation and verification.
+
+# Common Codes
 ## Periphery 
 ### inst_memory.sv
 Receive PC address and send out the instruction.  
@@ -60,3 +71,5 @@ Stall the pipeline to solve **load-use** hazzard and **brach flush**.
 ### defines.sv
 Define the macro for essential signals through pipeline stages and some basic configs.
 
+# Unique Codes
+See ```readme``` in ```Unique```'s subdir for details.
