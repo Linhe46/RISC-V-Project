@@ -32,6 +32,7 @@ module PC(
     end
 
     //assign PC_next = branch_taken ? branch_addr : PC_out + 4;
-    assign PC_next = bp ? BTB_target : (flush ? PC_correct : PC_out + 4);
+    //assign PC_next = bp ? BTB_target : (flush ? PC_correct : PC_out + 4);
+    assign PC_next = flush ? PC_correct : (bp ? BTB_target : PC_out + 4);
 
 endmodule

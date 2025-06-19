@@ -180,7 +180,7 @@ module branchPredictor(
     end
     assign bp_o = p_local & BTB_hit; // Branch prediction Output
     // flush correction for misprediction (false direction or target)
-    assign flush = ((bp_i != branch_taken) | (bp_i == branch_taken && BTB_target_i != branch_addr)) & pc != 0 & no_stall;
+    assign flush = ((bp_i != branch_taken) | (bp_i == 1'b1 && BTB_target_i != branch_addr)) & pc != 0 & no_stall;
     assign PC_correct = branch_taken ? branch_addr : pc + 4; // Corrected PC for flush
 
 endmodule
