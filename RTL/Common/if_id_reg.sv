@@ -38,8 +38,8 @@ module if_id_reg(
         else begin
             PC_id   <=  PC_if;
             inst_id <=  flush ? 32'b0 : inst_if; // flush the fetched inst
-            bp_id   <=  bp_if;
-            BTB_target_id <= BTB_target_if;
+            bp_id   <=  flush ? 1'b0 : bp_if;
+            BTB_target_id <= flush ? 32'b0 : BTB_target_if;
         end
     end
 
