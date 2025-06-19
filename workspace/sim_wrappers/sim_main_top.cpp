@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 
     /* start simulation until reaching finish time */
     /* you can also write a for-loop to run certain times */
-    for(int i = 0; i < 50; i++){
+    for(int i = 0; i < 200; i++){
         contextp->timeInc(1);   // increase the simulator's time stamp
         top->clk = !top->clk;   // toggle clock
         if (!top->clk)

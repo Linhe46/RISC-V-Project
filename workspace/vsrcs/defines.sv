@@ -144,4 +144,16 @@
 `define INST_MEM_SIZE           16
 `define INST_MEM_SIZE_WIDTH     $clog2(`INST_MEM_SIZE)
 
+/*========================= Branch Predictor Params =====================*/
+`define BHT_DEPTH 8 // Branch History Table Entry Depth
+`define BHT_DEPTH_WIDTH $clog2(`BHT_DEPTH)
+`define BHT_ENTRY_WIDTH 3 // Branch History Table Entry Width
+
+`define LPHT_DEPTH 64 // Local Predictor History Table Entry Depth
+`define LPHT_DEPTH_WIDTH $clog2(`LPHT_DEPTH)
+
+`define BTB_DEPTH 32 // Branch Target Buffer Index Width
+`define BTB_DEPTH_WIDTH $clog2(`BTB_DEPTH)
+
+
 `endif

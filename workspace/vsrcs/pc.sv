@@ -10,8 +10,12 @@ module PC(
     input   logic                       clk,
     input   logic                       rst,
     input   logic                       wr_en,
-    input   logic                       branch_taken,
-    input   logic[`MEM_ADDR_WIDTH-1:0]  branch_addr,
+    //input   logic                       branch_taken,
+    //input   logic[`MEM_ADDR_WIDTH-1:0]  branch_addr,
+    input   logic                       bp,
+    input   logic[31:0]                 BTB_target,
+    input   logic                       flush,      // flush signal from branch predictor
+    input   logic[31:0]                 PC_correct, // corrected PC from branch predictor
     output  logic[31:0]                 PC_out
 );
 
@@ -27,7 +31,7 @@ module PC(
             PC_out <= PC_next;
     end
 
-    assign PC_next = branch_taken ? branch_addr : PC_out + 4;
-
+    //assign PC_next = branch_taken ? branch_addr : PC_out + 4;
+    assign PC_next = bp ? BTB_target : (flush ? PC_correct : PC_out + 4);
 
 endmodule

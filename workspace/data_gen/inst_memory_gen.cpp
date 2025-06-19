@@ -31,8 +31,8 @@ InstSet insts_ls{
 };
 
 InstSet insts_bra{
-    {"0000000_00011_00010_000_00010_0010011", 
-        "// ADDI\tx2, x0, 3"},   // x2 = x2 + 3
+    {"0000000_01111_00010_000_00010_0010011", 
+        "// ADDI\tx2, x0, 15"},   // x2 = x2 + 15
     {"0000000_00001_00001_000_00001_0010011", 
         "// ADDI\tx1, x1, 1"},   // x1 = x1 + 1 
     {"0000000_00001_00001_000_00001_0010011", 
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    auto& insts = insts_ls;
+    auto& insts = insts_bra;
 
     auto insts_num = insts.size();
     try{
