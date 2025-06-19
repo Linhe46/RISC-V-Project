@@ -5,8 +5,6 @@ module if_(
     input   logic[`STALL_WIDTH-1:0]     stall,
     input   logic[`MEM_ADDR_WIDTH-1:0]  pc_in,
     input   logic[`REG_DATA_WIDTH-1:0]  inst_imem,
-    //input   logic                       branch_taken, connected to PC directly
-    //input   logic[`MEM_ADDR_WIDTH-1:0]  branch_addr, 
     output  logic                       pc_wr_en,
     output  logic                       imem_rd_en,
     output  logic[`MEM_ADDR_WIDTH-1:0]  pc_out,
