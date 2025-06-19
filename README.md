@@ -178,4 +178,6 @@ We have implemented a **Two-level local history branch predictor based on 2-bit 
 ![BPD2](RTL/bpd2.png)
 ![BPD3](RTL/bpd3.png)
 
+After implementing the branch predictor, the verification result is optimized to 332ms under 100MHz clock, achieving 14% speedup.
+
 >Last updated: 2025.6.19
