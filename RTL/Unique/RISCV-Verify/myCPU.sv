@@ -121,6 +121,15 @@ module myCPU(
     // reg file signals begin
 
     /* no bypass at mem/wb pipeline regfile */
+    /* signals for branch predictor */
+    // pc control signals
+    logic                       bp_if;
+    logic[31:0]                 BTB_target_if;
+    logic                       flush;
+    logic[31:0]                 PC_correct; // corrected PC for flush        
+    // bp trace signals to judge misprediction
+    logic                       bp_id;
+    logic[31:0]                 BTB_target_id;
 
     if_ if_stage(
         .rst(rst),
@@ -138,12 +147,16 @@ module myCPU(
         .clk(clk),
         .rst(rst),
         .stall(stall),
-        .branch_taken(branch_taken_id),
+        .flush(flush),
         .PC_if(pc_if),
         .inst_if(inst_if),
+        .bp_if(bp_if),
+        .BTB_target_if(BTB_target_if),
         // outputs
         .PC_id(pc_id),
-        .inst_id(inst_id)
+        .inst_id(inst_id),
+        .bp_id(bp_id),
+        .BTB_target_id(BTB_target_id)
     );
     assign inst_pc_id = pc_id;
 
@@ -311,8 +324,10 @@ module myCPU(
         .clk(clk),
         .rst(rst),
         .wr_en(pc_wr_en),
-        .branch_taken(branch_taken_id),
-        .branch_addr(branch_addr_id),
+        .bp(bp_if),
+        .BTB_target(BTB_target_if),
+        .flush(flush),
+        .PC_correct(PC_correct),
         .PC_out(pc_reg)
     );
 
@@ -378,6 +393,26 @@ module myCPU(
         // outputs
         .stall(stall)
     );
+
+    branchPredictor bpd_u(
+        .clk(clk),
+        .rst(rst),
+        .pc_BPD(pc_reg), // current pc to predict
+        // traced info. to update predictor if miss (id stage)
+        .bp_i(bp_id),   // traced prediction output
+        .BTB_target_i(BTB_target_id), // traced branch target address
+        .pc(pc_id),
+        .is_branch(is_branch_id),
+        .branch_taken(branch_taken_id),
+        .branch_addr(branch_addr_id),
+        .stall(stall), // stall signal to control update
+        // outputs
+        .bp_o(bp_if),      // branch prediction output
+        .BTB_target_o(BTB_target_if), // target address from BTB
+        .flush(flush),
+        .PC_correct(PC_correct)  // Corrected PC for flush
+    );
+
 
     // IROM Interface
     assign inst_imem = irom_data;
